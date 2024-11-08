@@ -49,18 +49,16 @@ public class LoginScreen extends JFrame {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
 
-            Boolean isAdmin;
             try {
-                isAdmin = authenticateUser(email, password);
-                if (isAdmin == null) {
+                // Retrieve the customer_id after successful authentication
+                Integer customerId = authenticateUser(email, password);
+                if (customerId == null) {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
-                } else if (isAdmin) {
-                    JOptionPane.showMessageDialog(null, "Welcome Admin!");
-                    // Redirect to admin screen (to be implemented later)
                 } else {
-                    JOptionPane.showMessageDialog(null, "Welcome User!");
-                    new MakeupStore();
-                    dispose();
+                    // Successfully authenticated, pass customer_id to the MakeupStore
+                    JOptionPane.showMessageDialog(null, "Welcome!");
+                    new MakeupStore(customerId); // Pass customerId to MakeupStore
+                    dispose(); // Close the login window
                 }
             } catch (NataliaException ne) {
                 JOptionPane.showMessageDialog(null, "Connection error: " + ne.getMessage(), "Login Failed", JOptionPane.ERROR_MESSAGE);
@@ -71,24 +69,25 @@ public class LoginScreen extends JFrame {
     }
 
     // Authentication method
-    private Boolean authenticateUser(String email, String password) throws NataliaException, SQLException {
+    private Integer authenticateUser(String email, String password) throws NataliaException, SQLException {
         try (Connection connection = DatabaseConnector.getConnection()) {
-            String sql = "SELECT phone_no, is_admin FROM customers WHERE email_address = ?";
+            String sql = "SELECT customer_id, phone_no, is_admin FROM customers WHERE email_address = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, email);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
+                int customerId = resultSet.getInt("customer_id"); // Get the customer_id
                 String phoneNo = resultSet.getString("phone_no");
                 boolean isAdmin = resultSet.getBoolean("is_admin");
 
                 // Check if the last 4 digits of phone match the password
                 if (phoneNo.endsWith(password)) {
-                    return isAdmin;
+                    return customerId; // Return customer_id if authentication is successful
                 }
             }
         }
-        return null;
+        return null; // Return null if authentication fails
     }
 
     public static void main(String[] args) {
