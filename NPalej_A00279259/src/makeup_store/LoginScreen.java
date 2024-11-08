@@ -50,15 +50,22 @@ public class LoginScreen extends JFrame {
             String password = new String(passwordField.getPassword());
 
             try {
-                // Retrieve the customer_id after successful authentication
-                Integer customerId = authenticateUser(email, password);
-                if (customerId == null) {
+                // Retrieve customer_id and is_admin after successful authentication
+                UserAuthResult authResult = authenticateUser(email, password);
+                if (authResult == null) {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    // Successfully authenticated, pass customer_id to the MakeupStore
+                    // Successfully authenticated
                     JOptionPane.showMessageDialog(null, "Welcome!");
-                    new MakeupStore(customerId); // Pass customerId to MakeupStore
-                    dispose(); // Close the login window
+                    if (authResult.isAdmin) {
+                    	 // Open admin screen
+                        new AdminScreen(authResult.customerId);
+                    } else {
+                    	// Open customer screen
+                        new MakeupStore(authResult.customerId); 
+                    }
+                    // Close login window
+                    dispose(); 
                 }
             } catch (NataliaException ne) {
                 JOptionPane.showMessageDialog(null, "Connection error: " + ne.getMessage(), "Login Failed", JOptionPane.ERROR_MESSAGE);
@@ -69,7 +76,7 @@ public class LoginScreen extends JFrame {
     }
 
     // Authentication method
-    private Integer authenticateUser(String email, String password) throws NataliaException, SQLException {
+    private UserAuthResult authenticateUser(String email, String password) throws NataliaException, SQLException {
         try (Connection connection = DatabaseConnector.getConnection()) {
             String sql = "SELECT customer_id, phone_no, is_admin FROM customers WHERE email_address = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -77,20 +84,31 @@ public class LoginScreen extends JFrame {
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                int customerId = resultSet.getInt("customer_id"); // Get the customer_id
+                int customerId = resultSet.getInt("customer_id");
                 String phoneNo = resultSet.getString("phone_no");
                 boolean isAdmin = resultSet.getBoolean("is_admin");
 
                 // Check if the last 4 digits of phone match the password
                 if (phoneNo.endsWith(password)) {
-                    return customerId; // Return customer_id if authentication is successful
+                    return new UserAuthResult(customerId, isAdmin);
                 }
             }
         }
-        return null; // Return null if authentication fails
+        // Return null if authentication fails
+        return null; 
     }
 
     public static void main(String[] args) {
         new LoginScreen();
+    }
+}
+
+class UserAuthResult {
+    int customerId;
+    boolean isAdmin;
+
+    UserAuthResult(int customerId, boolean isAdmin) {
+        this.customerId = customerId;
+        this.isAdmin = isAdmin;
     }
 }
