@@ -173,4 +173,14 @@ public class UpdateCustomer extends JFrame {
 	        }
 	    }
 
+		
+		void deleteCustomer(int customerId) throws SQLException, NataliaException {
+			try (Connection connection = DatabaseConnector.getConnection()){
+				String query = "DELETE FROM customers WHERE customer_id = ?";
+				PreparedStatement statement = connection.prepareStatement(query);
+				statement.setInt(1, customerId);
+				statement.executeUpdate();
+				}
+			this.dispose();
+		}
 }
