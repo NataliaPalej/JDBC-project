@@ -50,7 +50,7 @@ public class LoginScreen extends JFrame {
             String password = new String(passwordField.getPassword());
 
             try {
-                // Retrieve customer_id and is_admin after successful authentication
+                // Retrieve the customer_id and is_admin status after successful authentication
                 UserAuthResult authResult = authenticateUser(email, password);
                 if (authResult == null) {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
@@ -58,14 +58,13 @@ public class LoginScreen extends JFrame {
                     // Successfully authenticated
                     JOptionPane.showMessageDialog(null, "Welcome!");
                     if (authResult.isAdmin) {
-                    	 // Open admin screen
+                    	 // Open admin screen 
                         new AdminScreen(authResult.customerId);
                     } else {
                     	// Open customer screen
                         new MakeupStore(authResult.customerId); 
                     }
-                    // Close login window
-                    dispose(); 
+                    dispose(); // Close the login window
                 }
             } catch (NataliaException ne) {
                 JOptionPane.showMessageDialog(null, "Connection error: " + ne.getMessage(), "Login Failed", JOptionPane.ERROR_MESSAGE);
@@ -75,7 +74,7 @@ public class LoginScreen extends JFrame {
         }
     }
 
-    // Authentication method
+    // Authentication method, returning an object that includes customer_id and is_admin status
     private UserAuthResult authenticateUser(String email, String password) throws NataliaException, SQLException {
         try (Connection connection = DatabaseConnector.getConnection()) {
             String sql = "SELECT customer_id, phone_no, is_admin FROM customers WHERE email_address = ?";
@@ -90,12 +89,11 @@ public class LoginScreen extends JFrame {
 
                 // Check if the last 4 digits of phone match the password
                 if (phoneNo.endsWith(password)) {
-                    return new UserAuthResult(customerId, isAdmin);
+                    return new UserAuthResult(customerId, isAdmin); // Return auth result if authentication is successful
                 }
             }
         }
-        // Return null if authentication fails
-        return null; 
+        return null; // Return null if authentication fails
     }
 
     public static void main(String[] args) {
@@ -103,6 +101,7 @@ public class LoginScreen extends JFrame {
     }
 }
 
+// Helper class to encapsulate authentication result
 class UserAuthResult {
     int customerId;
     boolean isAdmin;
