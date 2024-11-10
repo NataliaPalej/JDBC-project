@@ -7,71 +7,117 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.util.Vector;
+import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 public class MakeupStoreContent extends JInternalFrame implements ActionListener {
     
-    private JComboBox<String> filterComboBox;
+	private JComboBox<String> filterComboBox;
     private JTable productsTable;
-    private JButton orderButton;
     private DefaultTableModel tableModel;
     
-    public MakeupStoreContent() throws NataliaException {
+    public MakeupStoreContent(int customer_id) throws NataliaException {
         // Set up the frame
-        super("Makeup Store", true, true, true, true);
+        super("Makeup Store", false, false, false, false);
+        System.out.println("MakeupStoreContent:: Customer ID: " + customer_id);
         setSize(800, 400);
         setLayout(new BorderLayout());
 
-        filterComboBox = new JComboBox<>(new String[]{
-            "Price Low-High", "Price High-Low", "Category", "A-Z", "Z-A"
-        });
-        orderButton = new JButton("Order Selected Item");
+        filterComboBox = new JComboBox<>(new String[]{"Price Low-High", "Price High-Low", "Category", "A-Z", "Z-A"});
 
         // Panel for filters and order button
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Sort By:"));
         topPanel.add(filterComboBox);
+
+        JButton orderButton = new JButton("Place Order");
         topPanel.add(orderButton);
-        
+
         // Set up product table
-        tableModel = new DefaultTableModel(new String[]{"Product Code", "Product Name", "Category", "Brand", "Price", "Stock Status"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"Product Code", "Product Name", "Category", "Brand", "Description", "Price", "Stock Status", "Image", "Quantity"}, 0) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                // Set Image column to Icon class and Quantity column to Integer class
+                return (column == 7) ? Icon.class : (column == 8) ? Integer.class : Object.class;
+            }
+        };
+        
         productsTable = new JTable(tableModel);
+        productsTable.getColumnModel().getColumn(8).setCellEditor(new EditQuantity());
+        productsTable.setRowHeight(80);
+        
         JScrollPane scrollPane = new JScrollPane(productsTable);
         
         // Add components to the frame
         add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Load initial product data and set up listeners
-        loadProducts("SELECT * FROM products");  // Load products initially without sorting
+        // Load products data 
+        loadProducts("SELECT * FROM products");
         filterComboBox.addActionListener(this);
-        orderButton.addActionListener(this);
+        
+        // Add action listener for order button
+        orderButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // List to store selected products with quantities
+                java.util.List<ProductOrderItem> selectedItems = new ArrayList<>();
+
+                for (int row = 0; row < productsTable.getRowCount(); row++) {
+                    // Get quantity from the Quantity column
+                    Integer quantity = (Integer) productsTable.getValueAt(row, 8);
+                    if (quantity != null && quantity > 0) {
+                        String productCode = (String) productsTable.getValueAt(row, 0);
+                        selectedItems.add(new ProductOrderItem(productCode, quantity));
+                    }
+                }
+
+                // Call processOrder once with the list of selected items
+                if (!selectedItems.isEmpty()) {
+                    try {
+                        processOrder(customer_id, selectedItems);
+                    } catch (NataliaException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
 
         setVisible(true);
     }
 
-    // Load products with a given query
+    // Load products with specific filter
     private void loadProducts(String query) throws NataliaException {
-        tableModel.setRowCount(0);  // Clear previous data
-        try (Connection conn = DatabaseConnector.getConnection();
-             Statement stmt = conn.createStatement();
+    	// Clear previous data
+        tableModel.setRowCount(0);  
+
+        try (Connection connection = DatabaseConnector.getConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
-                Vector<Object> row = new Vector<>();
-                row.add(rs.getString("product_code"));
-                row.add(rs.getString("product_name"));
-                row.add(rs.getString("category"));
-                row.add(rs.getString("product_brand"));
-                row.add(rs.getDouble("price"));
-                row.add(rs.getString("stock_status"));
-                tableModel.addRow(row);
+                // Load and scale the image directly from path
+                ImageIcon icon = new ImageIcon(new ImageIcon(rs.getString("product_img")).getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH));
+
+                tableModel.addRow(new Object[]{
+                    rs.getString("product_code"),
+                    rs.getString("product_name"),
+                    rs.getString("category"),
+                    rs.getString("product_brand"),
+                    rs.getString("description"),
+                    rs.getDouble("price"),
+                    rs.getString("stock_status"),
+                    // Image displayed as icon in the table
+                    icon, 
+                    // Quantity default to 0
+                    0 
+                });
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error loading products: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+ 
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -98,31 +144,91 @@ public class MakeupStoreContent extends JInternalFrame implements ActionListener
                     break;
             }
             try {
-				loadProducts(query);
-			} catch (NataliaException e1) {
-				e1.printStackTrace();
-			}
-        } else if (e.getSource() == orderButton) {
-            // Order selected item
-            int selectedRow = productsTable.getSelectedRow();
-            if (selectedRow != -1) {
-                int productId = (int) tableModel.getValueAt(selectedRow, 0);
-                placeOrder(productId);
-            } else {
-                JOptionPane.showMessageDialog(this, "Please select a product to order.", "No Product Selected", JOptionPane.WARNING_MESSAGE);
+                loadProducts(query);
+            } catch (NataliaException e1) {
+                e1.printStackTrace();
             }
         }
     }
+    
+    private void processOrder(int customer_id, java.util.List<ProductOrderItem> items) throws NataliaException {
+        String sp_create_order = "{call sp_createOrder(?, ?)}"; 
+        int order_id;
 
-    // Placeholder method for placing an order (to be customized as needed)
-    private void placeOrder(int productId) {
-        // Implement order logic (e.g., inserting into an orders table, showing confirmation dialog, etc.)
-        JOptionPane.showMessageDialog(this, "Order placed for product ID: " + productId, "Order Confirmed", JOptionPane.INFORMATION_MESSAGE);
+        try (Connection connection = DatabaseConnector.getConnection();
+             CallableStatement createOrderStmt = connection.prepareCall(sp_create_order)) {
+
+            connection.setAutoCommit(false);
+            
+            // Call sp_createOrder only once to create a new order and get the order ID
+            createOrderStmt.setInt(1, customer_id);
+            createOrderStmt.registerOutParameter(2, Types.INTEGER);
+
+            createOrderStmt.execute();
+            order_id = createOrderStmt.getInt(2);  
+            
+            if (order_id == 0) {
+                JOptionPane.showMessageDialog(this, "[ERROR] Couldn't create new order", "Order Error", JOptionPane.ERROR_MESSAGE);
+                connection.rollback();
+                return;
+            }
+
+            String sp_addProduct = "{call sp_addProduct(?, ?, ?)}"; 
+            StringBuilder orderStatusMessages = new StringBuilder();
+
+            // Loop through items and add each to the same order
+            try (CallableStatement addOrderItemStmt = connection.prepareCall(sp_addProduct)) {
+                for (ProductOrderItem item : items) {
+                    addOrderItemStmt.setInt(1, order_id); 
+                    addOrderItemStmt.setString(2, item.getProductCode());
+                    addOrderItemStmt.setInt(3, item.getQuantity());
+
+                    // Execute AddOrderItem procedure
+                    boolean hasResultSet = addOrderItemStmt.execute();
+                    
+                    // Accumulate status for each item
+                    if (hasResultSet) {
+                        try (ResultSet rs = addOrderItemStmt.getResultSet()) {
+                            if (rs.next()) {
+                                String resultMessage = rs.getString(1);
+                                orderStatusMessages.append(resultMessage).append("\n"); // Append each result message
+                            }
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error while adding order items: " + ex.getMessage(), "Order Error", JOptionPane.ERROR_MESSAGE);
+                connection.rollback();  
+                return;
+            }
+
+            // Commit the order if all items are successfully added
+            connection.commit();
+            
+            // Show all item messages in one final confirmation message
+            JOptionPane.showMessageDialog(this, "Order placed successfully:\n" + orderStatusMessages.toString(), "Order Status", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error while creating order: " + ex.getMessage(), "Order Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
+// Class to process multiple items in one order 
+class ProductOrderItem {
+    private String productCode;
+    private int quantity;
+
+    public ProductOrderItem(String productCode, int quantity) {
+        this.productCode = productCode;
+        this.quantity = quantity;
     }
 
+    public String getProductCode() {
+        return productCode;
+    }
 
-	public static void main(String[] args) throws NataliaException {
-		new MakeupStoreContent();
-	}
-
+    public int getQuantity() {
+        return quantity;
+    }
 }
