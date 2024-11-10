@@ -163,7 +163,7 @@ begin
     set tax_amount = total_amount * 0.23;
     
     -- Update orders table with values
-    update orders set total_order_amount = total_amount, tax_amount = tax_amount where order_id = new.order_id;
+    update orders set total_order_amount = total_amount + tax_amount, tax_amount = tax_amount where order_id = new.order_id;
 end //
 delimiter ;
 
@@ -207,6 +207,14 @@ select * from order_details;
 drop view if exists customer_details_view;
 create view customer_details_view as select first_name, last_name, address1, address2, city, eircode, phone_no, email_address from customers;
 select * from customer_details_view;
+
+drop view if exists customer_orders_view;
+create view customer_orders_view as select c.customer_id, o.order_id, p.product_code, p.product_name, od.quantity, od.total_item_cost, o.tax_amount, o.total_order_amount, o.order_date from order_details od 
+join products p on od.product_id = p.product_id 
+join orders o on od.order_id = o.order_id 
+join customers c on o.customer_id = c.customer_id;
+
+select * from customer_orders_view where customer_id = 11;
 
 /*
 *   STORED PROCEDURES
@@ -274,6 +282,20 @@ begin
 		rollback;
 		select "[ERROR] Couldn't add item to the order" as status;
 	end if;
+end //
+delimiter ;
+
+-- View Orders 
+drop procedure if exists sp_viewOrders;
+delimiter //
+create procedure sp_viewOrders(
+	orderID int
+)
+begin
+	select o.order_date as "Order Date", p.product_code as "Product Code", p.product_name as "Product Name", od.quantity as "Quantity",
+    od.total_item_cost as "Total Product Cost", p.discount_percent as "Discount",  (od.total_item_cost* (1 - (p.discount_percent / 100))) as "Discounted Price",
+    o.tax_amount as "Tax Amount", o.total_order_amount as "Total" from order_details od inner join products p on od.product_id = p.product_id
+    inner join orders o on od.order_id = o.order_id where o.order_id = order_id;
 end //
 delimiter ;
 

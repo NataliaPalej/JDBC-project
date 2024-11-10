@@ -86,16 +86,13 @@ public class MakeupStore extends JFrame implements ActionListener {
 
 			if (confirmation == JOptionPane.YES_OPTION) {
 				try {
-					// Directly call deleteCustomer without opening UpdateCustomer form
 					UpdateCustomer updateCustomer = new UpdateCustomer(customer_id);
 					updateCustomer.deleteCustomer(customer_id);
 
-					String msg = "<html>" + "<div style='text-align: center;'>Account deleted. "
+					String msg = "<html>" + "<div style='text-align: center; font-family: DialogInput;''>Account deleted. "
 							+ "<p style='text-align: center;'>Your account has been deleted successfully.</p>"
 							+ "</div></html>";
 					JOptionPane.showMessageDialog(this, msg, "Account Deleted", JOptionPane.INFORMATION_MESSAGE);
-
-					// Close MakeupStore and open LoginScreen
 					this.dispose();
 					// Redirects to the login screen after deletion
 					new LoginScreen();
