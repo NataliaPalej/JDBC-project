@@ -72,7 +72,7 @@ public class MakeupStoreContent extends JInternalFrame implements ActionListener
                     }
                 }
 
-                // Call processOrder once with the list of selected items
+                // Call processOrder with list of selected items
                 if (!selectedItems.isEmpty()) {
                     try {
                         processOrder(customer_id, selectedItems);
@@ -201,12 +201,16 @@ public class MakeupStoreContent extends JInternalFrame implements ActionListener
                 connection.rollback();  
                 return;
             }
-
             // Commit the order if all items are successfully added
             connection.commit();
-            
+            String msg = "<html>"
+            		+ "<div style='text-align: center;'>"
+            		+ "<p style='font-size: 16px; font-weight: bold; font-family: DialogInput;'>Order placed successfully.</p>"
+            		+ "<p></p><p style='text-align: center;'>Item(s) ordered:</p>"
+            		+ "<p style='text-align: center; font-family: sans-serif;'>" + orderStatusMessages.toString().replace("\n", "<br>") + "</p>"
+            		+ "<p></p><div></html>";
             // Show all item messages in one final confirmation message
-            JOptionPane.showMessageDialog(this, "Order placed successfully:\n" + orderStatusMessages.toString(), "Order Status", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, msg, "Order Status", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error while creating order: " + ex.getMessage(), "Order Error", JOptionPane.ERROR_MESSAGE);
