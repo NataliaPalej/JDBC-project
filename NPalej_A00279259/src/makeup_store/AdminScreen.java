@@ -250,6 +250,7 @@ public class AdminScreen extends JFrame {
 		JLabel searchLabel = new JLabel("Enter Product ID:");
 	    JTextField searchField = new JTextField(10); 
 	    JButton searchButton = new JButton("SEARCH");
+	    JButton clearButton = new JButton("CLEAR");
 	    
 	    searchButton.addActionListener(e -> {
 	        String productIdText = searchField.getText().trim();
@@ -265,9 +266,20 @@ public class AdminScreen extends JFrame {
 	        }
 	    });
 	    
+	    clearButton.addActionListener(e -> {
+	        try {
+	            loadProducts("SELECT * FROM products");
+	            searchField.setText(""); // Clear the search field
+	        } catch (NataliaException ex) {
+	            JOptionPane.showMessageDialog(this, "Error loading all products: " + ex.getMessage(), "Database Error",
+	                    JOptionPane.ERROR_MESSAGE);
+	        }
+	    });
+	    
 	    searchPanel.add(searchLabel);
 	    searchPanel.add(searchField);
 	    searchPanel.add(searchButton);
+	    searchPanel.add(clearButton);
 	    
 	    tableModel = new DefaultTableModel(new String[] { "Product Code", "Product Name", "Category", "Brand",
 				"Description", "Price", "Stock Status", "Image" }, 0) {
