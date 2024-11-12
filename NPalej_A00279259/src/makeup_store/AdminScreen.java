@@ -165,7 +165,7 @@ public class AdminScreen extends JFrame {
 			String brand = product_brand.getText();
 			String name = product_name.getText();
 			String desc = description.getText();
-			String imgPath = product_img.getText();
+			String imgPath = "images/" + product_img.getText() + ".jpg";
 
 			// Convert and validate numeric fields
 			BigDecimal priceValue, discountValue;
@@ -178,7 +178,7 @@ public class AdminScreen extends JFrame {
 						.setScale(2, RoundingMode.HALF_UP);
 				stockValue = stock.getText().isEmpty() ? 0 : Integer.parseInt(stock.getText());
 			} catch (NumberFormatException ex) {
-				JOptionPane.showMessageDialog(null, "Please enter valid numbers for Price, Discount %, and Stock.",
+				JOptionPane.showMessageDialog(null, "Please enter valid numbers for Price, Discount % and Stock.",
 						"Input Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
@@ -189,15 +189,26 @@ public class AdminScreen extends JFrame {
 				if (success) {
 					String message = "<html><div style='text-align: center;'>"
 							+ "<p style='font-size: 16px; font-weight: bold; font-family: DialogInput;'>Product added successfully</p>"
-							+ "<p style='text-align: center;'>Product " + code + " " + name + " added successfully!</p>"
+							+ "<p style='text-align: center;'>Product " + code + " : " + name + " added.</p>"
 							+ "</div></html>";
 					JOptionPane.showMessageDialog(null, message, "Success", JOptionPane.INFORMATION_MESSAGE);
+
+					// Clear fields 
+					product_code.setText("");
+			        category.setText("");
+			        product_brand.setText("");
+			        product_name.setText("");
+			        description.setText("");
+			        price.setText("");
+			        discount_percent.setText("");
+			        stock.setText("");
+			        product_img.setText("");
 				} else {
 					JOptionPane.showMessageDialog(null, "Failed to add product. Please check your inputs.", "Error",
 							JOptionPane.ERROR_MESSAGE);
 				}
 			} catch (SQLException ex) {
-				JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), "Add Product Failed",
+				JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), "\nAdd Product Failed",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (NataliaException e1) {
 				// TODO Auto-generated catch block
@@ -205,6 +216,8 @@ public class AdminScreen extends JFrame {
 			}
 		}
 	}
+	
+	
 
 	private boolean saveProductToDatabase(String code, String category, String brand, String name, String desc,
 			BigDecimal price, BigDecimal discount, int stock, String imgPath) throws SQLException, NataliaException {
@@ -225,7 +238,8 @@ public class AdminScreen extends JFrame {
 			stmt.setString(9, imgPath);
 
 			int rowsAffected = stmt.executeUpdate();
-			return rowsAffected > 0; // Return true if a row was inserted
+			// Return true if a row was inserted
+			return rowsAffected > 0; 
 		}
 	}
 

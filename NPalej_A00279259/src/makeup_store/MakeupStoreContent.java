@@ -207,7 +207,7 @@ public class MakeupStoreContent extends JInternalFrame implements ActionListener
             connection.commit();
             String msg = "<html>"
             		+ "<div style='text-align: center;'>"
-            		+ "<p style='font-size: 16px; font-weight: bold; font-family: DialogInput;'>Order placed successfully.</p>"
+            		+ "<p style='font-size: 16px; font-weight: bold; font-family: DialogInput;'>Order placed successfully</p>"
             		+ "<p></p><p style='text-align: center;'>Item(s) ordered:</p>"
             		+ "<p style='text-align: center; font-family: sans-serif;'>" + orderStatusMessages.toString().replace("\n", "<br>") + "</p>"
             		+ "<p></p><div></html>";
