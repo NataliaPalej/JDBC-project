@@ -211,14 +211,11 @@ public class AdminScreen extends JFrame {
 				JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), "\nAdd Product Failed",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (NataliaException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
 	}
 	
-	
-
 	private boolean saveProductToDatabase(String code, String category, String brand, String name, String desc,
 			BigDecimal price, BigDecimal discount, int stock, String imgPath) throws SQLException, NataliaException {
 		String query = "INSERT INTO products (product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -244,10 +241,35 @@ public class AdminScreen extends JFrame {
 	}
 
 	/*******************
-	 * View products *
+	 *  View Products  *
 	 *******************/
 	private JPanel createViewProductPanel() throws NataliaException {
-		tableModel = new DefaultTableModel(new String[] { "Product Code", "Product Name", "Category", "Brand",
+		JPanel searchPanel = new JPanel();
+	    searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		JLabel searchLabel = new JLabel("Enter Product ID:");
+	    JTextField searchField = new JTextField(10); 
+	    JButton searchButton = new JButton("SEARCH");
+	    
+	    searchButton.addActionListener(e -> {
+	        String productIdText = searchField.getText().trim();
+	        if (!productIdText.isEmpty()) {
+	            try {
+	                int productId = Integer.parseInt(productIdText);
+	                searchProductById(productId);
+	            } catch (NumberFormatException | NataliaException ex) {
+	                JOptionPane.showMessageDialog(this, "Please enter a valid numeric Product ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+	            }
+	        } else {
+	            JOptionPane.showMessageDialog(this, "Product ID cannot be empty.", "Input Error", JOptionPane.WARNING_MESSAGE);
+	        }
+	    });
+	    
+	    searchPanel.add(searchLabel);
+	    searchPanel.add(searchField);
+	    searchPanel.add(searchButton);
+	    
+	    tableModel = new DefaultTableModel(new String[] { "Product Code", "Product Name", "Category", "Brand",
 				"Description", "Price", "Stock Status", "Image" }, 0) {
 			@Override
 			public Class<?> getColumnClass(int column) {
@@ -259,16 +281,18 @@ public class AdminScreen extends JFrame {
 		productsTable.setRowHeight(80);
 
 		JScrollPane scrollPane = new JScrollPane(productsTable);
-		JPanel panel = new JPanel(new BorderLayout()); // Create a new panel for the view product content
+		JPanel panel = new JPanel(new BorderLayout());
+		
+		panel.add(searchPanel, BorderLayout.NORTH);
 		panel.add(scrollPane, BorderLayout.CENTER);
 
 		// Load products data
 		loadProducts("SELECT * FROM products");
 
-		return panel; // Return the panel instead of adding it directly
+		return panel;
 	}
 
-	// Load products with specific filter
+	// Load products
 	private void loadProducts(String query) throws NataliaException {
 		// Clear previous data
 		tableModel.setRowCount(0);
@@ -290,6 +314,34 @@ public class AdminScreen extends JFrame {
 			JOptionPane.showMessageDialog(this, "Error loading products: " + ex.getMessage(), "Database Error",
 					JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	// Method to load a specific product by product ID
+	private void searchProductById(int productId) throws NataliaException {
+	    String query = "SELECT * FROM products WHERE product_id = ?";
+	    tableModel.setRowCount(0); // Clear previous data
+
+	    try (Connection connection = DatabaseConnector.getConnection();
+	         PreparedStatement stmt = connection.prepareStatement(query)) {
+	        
+	        stmt.setInt(1, productId); // Set product_id in query
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                // Load and scale the image directly from path
+	                ImageIcon icon = new ImageIcon(new ImageIcon(rs.getString("product_img")).getImage()
+	                        .getScaledInstance(70, 70, Image.SCALE_SMOOTH));
+
+	                tableModel.addRow(new Object[] { rs.getString("product_code"), rs.getString("product_name"),
+	                        rs.getString("category"), rs.getString("product_brand"), rs.getString("description"),
+	                        rs.getDouble("price"), rs.getString("stock_status"), icon });
+	            } else {
+	                JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+	            }
+	        }
+	    } catch (SQLException ex) {
+	        JOptionPane.showMessageDialog(this, "Error searching product: " + ex.getMessage(), "Database Error",
+	                JOptionPane.ERROR_MESSAGE);
+	    }
 	}
 
 	/******************
