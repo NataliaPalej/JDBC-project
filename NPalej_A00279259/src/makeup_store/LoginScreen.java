@@ -17,7 +17,7 @@ public class LoginScreen extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(3, 2));
+        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
 
         // Email input
         panel.add(new JLabel("Email:"));
@@ -38,8 +38,12 @@ public class LoginScreen extends JFrame {
         JButton registerButton = new JButton("Register");
         registerButton.addActionListener(e -> new Register());
         panel.add(registerButton);
+        
+        JPanel paddingPanel = new JPanel(new BorderLayout());
+        paddingPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        paddingPanel.add(panel, BorderLayout.CENTER);
 
-        add(panel);
+        add(paddingPanel);
         setVisible(true);
     }
 
@@ -58,7 +62,8 @@ public class LoginScreen extends JFrame {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
                 } else {
                     // Successfully authenticated
-                    JOptionPane.showMessageDialog(null, "Welcome!");
+                	String message = "<html><div style='text-align: center;'><h3 style='font-family: DialogInput;'>Welcome to Makeup Store</h3><br></div></html>";
+                    JOptionPane.showMessageDialog(null, message);
                     if (authResult.isAdmin) {
                     	 // Open admin screen 
                         new AdminScreen(authResult.getCustomerID());
@@ -117,6 +122,5 @@ class UserAuthResult {
     
     public int getCustomerID() {
     	return this.customer_id;
-    }
-    
+    } 
 }

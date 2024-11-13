@@ -3,6 +3,9 @@ package makeup_store;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
@@ -10,6 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,7 +28,8 @@ public class AdminScreen extends JFrame {
 	private JTable productsTable;
 	private DefaultTableModel tableModel;
 
-	private JTextField product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img;
+	private JTextField product_code, category, product_brand, product_name, description, price, discount_percent, stock,
+			product_img;
 
 	public AdminScreen(int customer_id) throws NataliaException {
 		setTitle("Admin");
@@ -491,9 +497,17 @@ public class AdminScreen extends JFrame {
 							discount, stockText, img)) {
 						JOptionPane.showMessageDialog(this, "Product ID " + productId + " updated successfully.",
 								"Success", JOptionPane.INFORMATION_MESSAGE);
-						
-						clearFields();
-						
+
+						product_code.setText("");
+						category.setText("");
+						product_brand.setText("");
+						product_name.setText("");
+						description.setText("");
+						price.setText("");
+						discount_percent.setText("");
+						stock.setText("");
+						product_img.setText("");
+
 						loadProducts("SELECT * FROM products");
 					} else {
 						JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Update Failed",
@@ -535,7 +549,8 @@ public class AdminScreen extends JFrame {
 
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException ex) {
-			JOptionPane.showMessageDialog(this, "Error updating product: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Error updating product: " + ex.getMessage(), "Database Error",
+					JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 	}
@@ -543,178 +558,171 @@ public class AdminScreen extends JFrame {
 	/*********************
 	 * Delete Product *
 	 *******************/
-
 	private JPanel createDeleteProductPanel() {
-		
+
 		JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-	    JLabel searchLabel = new JLabel("Enter Product ID:");
-	    JTextField searchField = new JTextField(10);
-	    JButton searchButton = new JButton("SEARCH");
-	    
-	    // Main panel layout
-	    JPanel panel = new JPanel(new BorderLayout());
-	    searchPanel.add(searchLabel);
-	    searchPanel.add(searchField);
-	    searchPanel.add(searchButton);
-
-	    panel.add(searchPanel, BorderLayout.NORTH);
-	    
-	    // Product details to delete panel
-	    JPanel contentPanel = new JPanel(new GridLayout(0, 1));
-	    JLabel deleteProductInfo = new JLabel("");
-	    JButton deleteButton = new JButton("DELETE");
-	    JButton cancelButton = new JButton("CANCEL");
-	    
-	    contentPanel.add(deleteProductInfo);
-	    contentPanel.add(deleteButton);
-	    contentPanel.add(cancelButton);
-	    
-	    // Disable delete until a product is loaded
-	    deleteButton.setEnabled(false);
-	    panel.add(contentPanel, BorderLayout.CENTER);
-	    
-	    // Action for SEARCH button
-	    searchButton.addActionListener(e -> {
-	        String productIdText = searchField.getText().trim();
-	        if (!productIdText.isEmpty()) {
-	            try {
-	                int productId = Integer.parseInt(productIdText);
-	                // Load product info
-	                loadProductForDeletion(productId, deleteProductInfo, deleteButton); 
-	            } catch (NumberFormatException | NataliaException ex) {
-	                JOptionPane.showMessageDialog(this, "Please enter a valid numeric Product ID.", "Input Error",
-	                        JOptionPane.ERROR_MESSAGE);
-	            }
-	        } else {
-	            JOptionPane.showMessageDialog(this, "Product ID cannot be empty.", "Input Error",
-	                    JOptionPane.WARNING_MESSAGE);
-	        }
-	    });
-	    
-	    // Action for DELETE button
-	    deleteButton.addActionListener(e -> {
-	        int confirmed = JOptionPane.showConfirmDialog(this,
-	                "Are you sure you want to delete this product? This action cannot be undone.",
-	                "Confirm Delete", JOptionPane.YES_NO_OPTION);
-	        if (confirmed == JOptionPane.YES_OPTION) {
-	            String productIdText = searchField.getText().trim();
-	            int productId = Integer.parseInt(productIdText);
-	            try {
-					if (deleteProduct(productId)) {
-					    JOptionPane.showMessageDialog(this, "Product ID " + productId + " deleted successfully.", "Success",
-					            JOptionPane.INFORMATION_MESSAGE);
-					    searchField.setText("");
-					    deleteProductInfo.setText("");
-					    // Disable delete until next product_id is entered
-					    deleteButton.setEnabled(false); 
-					} else {
-					    JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Delete Failed",
-					            JOptionPane.WARNING_MESSAGE);
-					}
-				} catch (HeadlessException | NataliaException e1) {
-					e1.printStackTrace();
-				}
-	        }
-	    });
-	    
-	    // Action for CANCEL button
-	    cancelButton.addActionListener(e -> {
-	        searchField.setText("");
-	        deleteProductInfo.setText(""); 
-	        // Disable delete button until product_id is entered
-	        deleteButton.setEnabled(false); 
-	    });
-
-	    return panel;
-	}
-	
-	// Method to load product details 
-	private void loadProductForDeletion(int productId, JLabel deleteProductInfo, JButton deleteButton) throws NataliaException {
-	    String query = "SELECT * FROM products WHERE product_id = ?";
-	    
-	    try (Connection connection = DatabaseConnector.getConnection();
-	         PreparedStatement stmt = connection.prepareStatement(query)) {
-	    	// Get product_id for query
-	        stmt.setInt(1, productId); 
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                // Display product details in the confirmation label
-	            	String productDetails = String.format(
-	            		    "<html><table style='border-spacing: 10px;'>"
-	            				+ "<tr><<th>ID</th><th>Code</th><th>Category</th><th>Brand</th><th>Name</th><th>Price</th><th>Stock</th></tr>"
-	            		        + "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%.2f</td><td>%s</td></tr>"
-	            		    + "</table></html>",
-	            		    rs.getString("product_id"),
-	            		    rs.getString("product_code"),
-	            		    rs.getString("category"),
-	            		    rs.getString("product_brand"),
-	            		    rs.getString("product_name"),
-	            		    rs.getDouble("price"),
-	            		    rs.getDouble("stock")
-	                );
-	            	deleteProductInfo.setText("<html><div style='text-align: center;'>" + productDetails + "</div></html>");
-	                deleteButton.setEnabled(true); // Enable delete button since a product was found
-	            } else {
-	                JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Search Result",
-	                        JOptionPane.INFORMATION_MESSAGE);
-	                deleteProductInfo.setText("");
-	            }
-	        }
-	    } catch (SQLException ex) {
-	        JOptionPane.showMessageDialog(this, "Error loading product details: " + ex.getMessage(), "Database Error",
-	                JOptionPane.ERROR_MESSAGE);
-	    }
-	}
-	
-	// Method to delete a product from the database
-	private boolean deleteProduct(int productId) throws NataliaException {
-	    String query = "DELETE FROM products WHERE product_id = ?";
-	    
-	    try (Connection connection = DatabaseConnector.getConnection();
-	         PreparedStatement stmt = connection.prepareStatement(query)) {
-	        
-	        stmt.setInt(1, productId);
-	        int rowsAffected = stmt.executeUpdate();
-	        return rowsAffected > 0; // Return true if a row was deleted, false if not
-
-	    } catch (SQLException ex) {
-	        JOptionPane.showMessageDialog(this, "Error deleting product: " + ex.getMessage(), "Database Error",
-	                JOptionPane.ERROR_MESSAGE);
-	        return false;
-	    }
-	}
-
-	
-	private JPanel createCustomerOrderPanel() {
-		/**
-		 * create view that will allow to enter order ID 
-		 * once order id entered, press search button to load data 
-		 * 
-		 * show details from customer_delivery_details_view to get customer delivery details 
-		 * and also 
-		 * customer_orders_view to get what customer ordered - make a pretty view, maybe reuse the screen from 
-		 * when customer views their order in the menu which is ViewOrdersContent class
-		 * the goal is to see what customer ordered in an invoice format 
-		 * 
-		 * add export button here 
-		 * */
-		
-		JPanel searchPanel = new JPanel();
-		searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		
-		JLabel searchOrderTitle = new JLabel("Find Order");
-		JLabel searchLabel = new JLabel("Enter Order ID: ");
-		JTextField searchField = new JTextField();
-		
+		JLabel searchLabel = new JLabel("Enter Product ID:");
+		JTextField searchField = new JTextField(10);
 		JButton searchButton = new JButton("SEARCH");
-		JButton clearButton = new JButton("CLEAR");
-		
+
+		// Main panel layout
+		JPanel panel = new JPanel(new BorderLayout());
+		searchPanel.add(searchLabel);
+		searchPanel.add(searchField);
+		searchPanel.add(searchButton);
+
+		panel.add(searchPanel, BorderLayout.NORTH);
+
+		// Product details to delete panel
+		JPanel contentPanel = new JPanel(new GridLayout(0, 1));
+		JLabel deleteProductInfo = new JLabel("");
+		JButton deleteButton = new JButton("DELETE");
+		JButton cancelButton = new JButton("CANCEL");
+
+		contentPanel.add(deleteProductInfo);
+		contentPanel.add(deleteButton);
+		contentPanel.add(cancelButton);
+
+		// Disable delete until a product is loaded
+		deleteButton.setEnabled(false);
+		panel.add(contentPanel, BorderLayout.CENTER);
+
+		// Action for SEARCH button
 		searchButton.addActionListener(e -> {
 			String productIdText = searchField.getText().trim();
 			if (!productIdText.isEmpty()) {
 				try {
 					int productId = Integer.parseInt(productIdText);
-					
+					// Load product info
+					loadProductForDeletion(productId, deleteProductInfo, deleteButton);
+				} catch (NumberFormatException | NataliaException ex) {
+					JOptionPane.showMessageDialog(this, "Please enter a valid numeric Product ID.", "Input Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Product ID cannot be empty.", "Input Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		});
+
+		// Action for DELETE button
+		deleteButton.addActionListener(e -> {
+			int confirmed = JOptionPane.showConfirmDialog(this,
+					"Are you sure you want to delete this product? This action cannot be undone.", "Confirm Delete",
+					JOptionPane.YES_NO_OPTION);
+			if (confirmed == JOptionPane.YES_OPTION) {
+				String productIdText = searchField.getText().trim();
+				int productId = Integer.parseInt(productIdText);
+				try {
+					if (deleteProduct(productId)) {
+						JOptionPane.showMessageDialog(this, "Product ID " + productId + " deleted successfully.",
+								"Success", JOptionPane.INFORMATION_MESSAGE);
+						searchField.setText("");
+						deleteProductInfo.setText("");
+						// Disable delete until next product_id is entered
+						deleteButton.setEnabled(false);
+					} else {
+						JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Delete Failed",
+								JOptionPane.WARNING_MESSAGE);
+					}
+				} catch (HeadlessException | NataliaException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		// Action for CANCEL button
+		cancelButton.addActionListener(e -> {
+			searchField.setText("");
+			deleteProductInfo.setText("");
+			// Disable delete button until product_id is entered
+			deleteButton.setEnabled(false);
+		});
+
+		return panel;
+	}
+
+	// Method to load product details
+	private void loadProductForDeletion(int productId, JLabel deleteProductInfo, JButton deleteButton)
+			throws NataliaException {
+		String query = "SELECT * FROM products WHERE product_id = ?";
+
+		try (Connection connection = DatabaseConnector.getConnection();
+				PreparedStatement stmt = connection.prepareStatement(query)) {
+			// Get product_id for query
+			stmt.setInt(1, productId);
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					// Display product details in the confirmation label
+					String productDetails = String.format("<html><table style='border-spacing: 10px;'>"
+							+ "<tr><<th>ID</th><th>Code</th><th>Category</th><th>Brand</th><th>Name</th><th>Price</th><th>Stock</th></tr>"
+							+ "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%.2f</td><td>%s</td></tr>"
+							+ "</table></html>", rs.getString("product_id"), rs.getString("product_code"),
+							rs.getString("category"), rs.getString("product_brand"), rs.getString("product_name"),
+							rs.getDouble("price"), rs.getDouble("stock"));
+					deleteProductInfo
+							.setText("<html><div style='text-align: center;'>" + productDetails + "</div></html>");
+					deleteButton.setEnabled(true); // Enable delete button since a product was found
+				} else {
+					JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Search Result",
+							JOptionPane.INFORMATION_MESSAGE);
+					deleteProductInfo.setText("");
+				}
+			}
+		} catch (SQLException ex) {
+			JOptionPane.showMessageDialog(this, "Error loading product details: " + ex.getMessage(), "Database Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	// Method to delete a product from the database
+	private boolean deleteProduct(int productId) throws NataliaException {
+		String query = "DELETE FROM products WHERE product_id = ?";
+
+		try (Connection connection = DatabaseConnector.getConnection();
+				PreparedStatement stmt = connection.prepareStatement(query)) {
+
+			stmt.setInt(1, productId);
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0; // Return true if a row was deleted, false if not
+
+		} catch (SQLException ex) {
+			JOptionPane.showMessageDialog(this, "Error deleting product: " + ex.getMessage(), "Database Error",
+					JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+	}
+
+	private JPanel createCustomerOrderPanel() {
+		/**
+		 * create view that will allow to enter order ID once order id entered, press
+		 * search button to load data
+		 * 
+		 * show details from customer_delivery_details_view to get customer delivery
+		 * details and also customer_orders_view to get what customer ordered - make a
+		 * pretty view, maybe reuse the screen from when customer views their order in
+		 * the menu which is ViewOrdersContent class the goal is to see what customer
+		 * ordered in an invoice format
+		 * 
+		 * add export button here
+		 */
+
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+		JLabel searchOrderTitle = new JLabel("Find Order");
+		JLabel searchLabel = new JLabel("Enter Order ID: ");
+		JTextField searchField = new JTextField();
+
+		JButton searchButton = new JButton("SEARCH");
+		JButton clearButton = new JButton("CLEAR");
+
+		searchButton.addActionListener(e -> {
+			String productIdText = searchField.getText().trim();
+			if (!productIdText.isEmpty()) {
+				try {
+					int productId = Integer.parseInt(productIdText);
+
 				} catch (NumberFormatException ex) {
 					JOptionPane.showMessageDialog(this, "Please enter a valid numeric Order ID.", "Input Error",
 							JOptionPane.ERROR_MESSAGE);
@@ -741,7 +749,6 @@ public class AdminScreen extends JFrame {
 		searchPanel.add(searchButton);
 		searchPanel.add(clearButton);
 
-		
 		JPanel panel = new JPanel(new BorderLayout());
 
 		panel.add(searchPanel, BorderLayout.NORTH);
@@ -749,37 +756,160 @@ public class AdminScreen extends JFrame {
 		return panel;
 
 	}
-	
+
 	private JPanel createSalesPanel() {
-		/**
-		 * create view that will give options to check sales per :
-		 * category 
-		 * brand 
-		 * 
-		 * add export button here 
-		 * */
 		JPanel panel = new JPanel(new BorderLayout());
+
+		// ComboBox to choose the type of sales report
+		JLabel filterLabel = new JLabel("View Sales By:");
+		JComboBox<String> filterOptions = new JComboBox<>(new String[] { "", "Category", "Brand", "Product" });
+
+		// Panel for filter options
+		JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		filterPanel.add(filterLabel);
+		filterPanel.add(filterOptions);
+
+		JButton exportButton = new JButton("Export");
+		filterPanel.add(exportButton);
+
+		// Table to display sales data
+		String[] columnNames = { "Product Name", "Quantity Sold", "Total Sales" };
+		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+		JTable salesTable = new JTable(tableModel);
+
+		// Scroll pane for the table
+		JScrollPane scrollPane = new JScrollPane(salesTable);
+
+		// Add components to the main panel
+		panel.add(filterPanel, BorderLayout.NORTH);
+		panel.add(scrollPane, BorderLayout.CENTER);
+
+		// Action listener for filter selection
+		filterOptions.addActionListener(e -> {
+			String selectedOption = (String) filterOptions.getSelectedItem();
+			try {
+				if (selectedOption.equals("Category")) {
+					loadSalesDataByCategory(tableModel);
+				}
+				if (selectedOption.equals("Brand")) {
+					loadSalesDataByBrand(tableModel);
+				}
+				if (selectedOption.equals("Product")) {
+					loadSalesDataByProduct(tableModel);
+				}
+				if (selectedOption.equals("")) {
+			        tableModel.setRowCount(0);
+			    }
+			} catch (NataliaException ex) {
+				JOptionPane.showMessageDialog(panel, "Error loading sales data: " + ex.getMessage(), "Database Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		});
+
+		// Action for exportButton
+		exportButton.addActionListener(e -> {
+
+			// Get selected filter option (category)
+			String selectedOption = (String) filterOptions.getSelectedItem();
+
+			// Check if option selected
+			if (selectedOption.equals("")) {
+				JOptionPane.showMessageDialog(panel, "Please select a category before exporting.", "Export Error",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
+			try {
+				File exportFolder = new File("exports");
+				// Create exports folder if it doesn't exist
+				if (!exportFolder.exists()) {
+					exportFolder.mkdir();
+				}
+
+				// Get current date
+				String currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+				// Construct file name
+				String fileName = selectedOption.toLowerCase() + "-sales-" + currentDate + ".csv";
+				String filePath = "exports/" + fileName;
+
+				FileWriter csvWriter = new FileWriter(filePath);
+
+				// Write headers
+				for (int i = 0; i < tableModel.getColumnCount(); i++) {
+					csvWriter.append(tableModel.getColumnName(i)).append(",");
+				}
+				csvWriter.append("\n");
+
+				// Write data rows
+				for (int row = 0; row < tableModel.getRowCount(); row++) {
+					for (int col = 0; col < tableModel.getColumnCount(); col++) {
+						csvWriter.append(tableModel.getValueAt(row, col).toString()).append(",");
+					}
+					csvWriter.append("\n");
+				}
+
+				csvWriter.flush();
+				csvWriter.close();
+
+				JOptionPane.showMessageDialog(panel, "Data exported successfully to " + filePath, "Export Successful",
+						JOptionPane.INFORMATION_MESSAGE);
+			} catch (IOException ex) {
+				JOptionPane.showMessageDialog(panel, "Error exporting data: " + ex.getMessage(), "Export Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		});
 		return panel;
 	}
-	
-	
-	
-	
+
+	private void loadSalesDataByCategory(DefaultTableModel tableModel) throws NataliaException {
+		String query = "select * from sales_by_category_view";
+		loadDataIntoTable(query, tableModel);
+	}
+
+	private void loadSalesDataByBrand(DefaultTableModel tableModel) throws NataliaException {
+		String query = "select * from sales_by_brand_view";
+		loadDataIntoTable(query, tableModel);
+	}
+
+	private void loadSalesDataByProduct(DefaultTableModel tableModel) throws NataliaException {
+		String query = "select * from sales_by_product_view";
+		loadDataIntoTable(query, tableModel);
+	}
+
+	private void loadDataIntoTable(String query, DefaultTableModel tableModel) throws NataliaException {
+		// Clear previous data
+		tableModel.setRowCount(0);
+
+		try (Connection connection = DatabaseConnector.getConnection();
+				Statement stmt = connection.createStatement();
+				ResultSet rs = stmt.executeQuery(query)) {
+
+			while (rs.next()) {
+				Object[] rowData = {
+						// Category or Brand
+						rs.getString(1), rs.getInt("Quantity Sold"), rs.getBigDecimal("Total Sales") };
+				tableModel.addRow(rowData);
+			}
+		} catch (SQLException ex) {
+			throw new NataliaException("Error loading sales data: " + ex.getMessage());
+		}
+	}
+
+	private void clearFields() {
+		product_code.setText("");
+		category.setText("");
+		product_brand.setText("");
+		product_name.setText("");
+		description.setText("");
+		price.setText("");
+		discount_percent.setText("");
+		stock.setText("");
+		product_img.setText("");
+	}
+
 	public static void main(String[] args) throws NataliaException {
 		AdminScreen adminScreen = new AdminScreen(1);
 
-	}
-	
-	private void clearFields() {
-	    product_code.setText("");
-	    category.setText("");
-	    product_brand.setText("");
-	    product_name.setText("");
-	    description.setText("");
-	    price.setText("");
-	    discount_percent.setText("");
-	    stock.setText("");
-	    product_img.setText("");
 	}
 
 }
