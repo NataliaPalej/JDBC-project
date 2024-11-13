@@ -767,10 +767,10 @@ public class AdminScreen extends JFrame {
 	            invoiceArea.setText("No order details found for this Order ID.");
 	            return;
 	        }
-
+	       
 	        // Customer and order information (only populated once)
 	        invoice.append(rs.getString("first_name")).append(" ").append(rs.getString("last_name"))
-	               .append("\t\t\t\tOrder Date: ").append(rs.getString("order_date")).append("\n")
+	               .append("\t\tOrder Date: ").append(rs.getString("order_date")).append("\n")
 	               .append(rs.getString("address1")).append("\n")
 	               .append(rs.getString("address2")).append("\n")
 	               .append(rs.getString("city")).append("\n")
@@ -779,14 +779,11 @@ public class AdminScreen extends JFrame {
 	               .append("Phone: ").append(rs.getString("phone_no")).append("\n\n")
 	               .append("\t\t\tORDER DETAILS\n")
 	               .append("---------------------------------------------------------\n")
-	               .append("Product Code    Product Name       Quantity    Total Price\n")
-	               .append(rs.getString("product_code")).append("        ")
-	               .append(rs.getString("product_name")).append("        ")
-	               .append(rs.getInt("quantity")).append("        ")
+	               .append("Code\tName\t\t\tQuantity\tTotal Price\n")
+	               .append(rs.getString("product_code")).append("\t")
+	               .append(rs.getString("product_name")).append("\t")
+	               .append(rs.getInt("quantity")).append("\t\t")
 	               .append(rs.getDouble("total_item_cost")).append("\n");
-
-	        
-	        System.out.println("\n\ninvoice after dowhile::\n" + invoice);
 	        
 	        double taxAmount = rs.getDouble("tax_amount");
 	        double totalOrderAmount = rs.getDouble("total_order_amount");
