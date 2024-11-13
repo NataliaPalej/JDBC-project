@@ -73,11 +73,16 @@ public class MakeupStoreContent extends JInternalFrame implements ActionListener
                         selectedItems.add(new ProductOrderItem(productCode, quantity));
                     }
                 }
+               
 
                 // Call processOrder with list of selected items
                 if (!selectedItems.isEmpty()) {
                     try {
                         processOrder(customer_id, selectedItems);
+                        // Reset quantity back to 0 after the order is processed
+                        for (int row = 0; row < productsTable.getRowCount(); row++) {
+                            productsTable.setValueAt(0, row, 8);
+                        }
                     } catch (NataliaException e1) {
                         e1.printStackTrace();
                     }
