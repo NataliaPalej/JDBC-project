@@ -48,12 +48,13 @@ public class AdminScreen extends JFrame {
 		// Add labels and buttons
 		String optionsLabel = "<html><div style='text-align: center; font-size: 16px; font-family: DialogInput;'>Options</div></html>";
 		leftPanel.add(new JLabel(optionsLabel, SwingConstants.CENTER));
+		leftPanel.add(new JLabel());
 		leftPanel.add(optionButton("ADD", "AddProduct"));
 		leftPanel.add(optionButton("VIEW", "ViewProduct"));
 		leftPanel.add(optionButton("UPDATE", "UpdateProduct"));
 		leftPanel.add(optionButton("DELETE", "DeleteProduct"));
 		leftPanel.add(optionButton("DELIVERY DOC", "CustomerOrder"));
-		leftPanel.add(optionButton("SALES", "Sales"));
+		leftPanel.add(optionButton("VIEW SALES", "Sales"));
 		leftPanel.add(new JLabel());
 
 		// Create a wrapper panel for leftPanel with padding
@@ -545,82 +546,142 @@ public class AdminScreen extends JFrame {
 
 	private JPanel createDeleteProductPanel() {
 		
-		/****
-		 * layout needs to be fixed 
-		 * funtionallity works 
-		 * make it nice, like in update product 
-		 * when item is selected to be deleted, then add popup "are you sure you want to delete rpdouct id
-		 * + product name ? this action annot be undone CONFIRM/CANCEL
-		 */
-		JPanel panel = new JPanel(new BorderLayout());
+		JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    JLabel searchLabel = new JLabel("Enter Product ID:");
+	    JTextField searchField = new JTextField(10);
+	    JButton searchButton = new JButton("SEARCH");
+	    
+	    // Main panel layout
+	    JPanel panel = new JPanel(new BorderLayout());
+	    searchPanel.add(searchLabel);
+	    searchPanel.add(searchField);
+	    searchPanel.add(searchButton);
 
-		// Product ID entry specific to this view
-		JPanel topPanel = new JPanel();
-		topPanel.add(new JLabel("Enter Product ID:"));
-		product_id = new JTextField(10);
-		topPanel.add(product_id);
-		panel.add(topPanel, BorderLayout.NORTH);
-
-		// Delete product-specific content
-		JPanel contentPanel = new JPanel();
-		JLabel confirmationLabel = new JLabel("Are you sure you want to delete Product ID:");
-		contentPanel.add(confirmationLabel);
-
-		JButton yesButton = new JButton("DELETE");
-		JButton noButton = new JButton("CANCEL");
-		contentPanel.add(yesButton);
-		contentPanel.add(noButton);
-
-		panel.add(contentPanel, BorderLayout.CENTER);
-
-		// Action for DELETE button
-		yesButton.addActionListener(e -> {
-			String productIDText = product_id.getText().trim();
-			if (!productIDText.isEmpty()) {
-				try {
-					int productId = Integer.parseInt(productIDText);
-
-					// Attempt to delete the product
+	    panel.add(searchPanel, BorderLayout.NORTH);
+	    
+	    // Product details to delete panel
+	    JPanel contentPanel = new JPanel(new GridLayout(0, 1));
+	    JLabel deleteProductInfo = new JLabel("");
+	    JButton deleteButton = new JButton("DELETE");
+	    JButton cancelButton = new JButton("CANCEL");
+	    
+	    contentPanel.add(deleteProductInfo);
+	    contentPanel.add(deleteButton);
+	    contentPanel.add(cancelButton);
+	    
+	    // Disable delete until a product is loaded
+	    deleteButton.setEnabled(false);
+	    panel.add(contentPanel, BorderLayout.CENTER);
+	    
+	    // Action for SEARCH button
+	    searchButton.addActionListener(e -> {
+	        String productIdText = searchField.getText().trim();
+	        if (!productIdText.isEmpty()) {
+	            try {
+	                int productId = Integer.parseInt(productIdText);
+	                // Load product info
+	                loadProductForDeletion(productId, deleteProductInfo, deleteButton); 
+	            } catch (NumberFormatException | NataliaException ex) {
+	                JOptionPane.showMessageDialog(this, "Please enter a valid numeric Product ID.", "Input Error",
+	                        JOptionPane.ERROR_MESSAGE);
+	            }
+	        } else {
+	            JOptionPane.showMessageDialog(this, "Product ID cannot be empty.", "Input Error",
+	                    JOptionPane.WARNING_MESSAGE);
+	        }
+	    });
+	    
+	    // Action for DELETE button
+	    deleteButton.addActionListener(e -> {
+	        int confirmed = JOptionPane.showConfirmDialog(this,
+	                "Are you sure you want to delete this product? This action cannot be undone.",
+	                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+	        if (confirmed == JOptionPane.YES_OPTION) {
+	            String productIdText = searchField.getText().trim();
+	            int productId = Integer.parseInt(productIdText);
+	            try {
 					if (deleteProduct(productId)) {
-						JOptionPane.showMessageDialog(this, "Product ID " + productId + " deleted successfully.",
-								"Success", JOptionPane.INFORMATION_MESSAGE);
+					    JOptionPane.showMessageDialog(this, "Product ID " + productId + " deleted successfully.", "Success",
+					            JOptionPane.INFORMATION_MESSAGE);
+					    searchField.setText("");
+					    deleteProductInfo.setText("");
+					    // Disable delete until next product_id is entered
+					    deleteButton.setEnabled(false); 
 					} else {
-						JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Deletion Failed",
-								JOptionPane.WARNING_MESSAGE);
+					    JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Delete Failed",
+					            JOptionPane.WARNING_MESSAGE);
 					}
-				} catch (NumberFormatException | HeadlessException | NataliaException ex) {
-					JOptionPane.showMessageDialog(this, "Invalid Product ID. Please enter a numeric value.",
-							"Input Error", JOptionPane.ERROR_MESSAGE);
+				} catch (HeadlessException | NataliaException e1) {
+					e1.printStackTrace();
 				}
-			} else {
-				JOptionPane.showMessageDialog(this, "Please enter a Product ID to delete.", "Input Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		});
+	        }
+	    });
+	    
+	    // Action for CANCEL button
+	    cancelButton.addActionListener(e -> {
+	        searchField.setText("");
+	        deleteProductInfo.setText(""); 
+	        // Disable delete button until product_id is entered
+	        deleteButton.setEnabled(false); 
+	    });
 
-		// Action for CANCEL button
-		noButton.addActionListener(e -> {
-			product_id.setText(""); // Clear the input field
-		});
-
-		return panel;
+	    return panel;
 	}
-
+	
+	// Method to load product details 
+	private void loadProductForDeletion(int productId, JLabel deleteProductInfo, JButton deleteButton) throws NataliaException {
+	    String query = "SELECT * FROM products WHERE product_id = ?";
+	    
+	    try (Connection connection = DatabaseConnector.getConnection();
+	         PreparedStatement stmt = connection.prepareStatement(query)) {
+	    	// Get product_id for query
+	        stmt.setInt(1, productId); 
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                // Display product details in the confirmation label
+	            	String productDetails = String.format(
+	            		    "<html><table style='border-spacing: 10px;'>"
+	            				+ "<tr><<th>ID</th><th>Code</th><th>Category</th><th>Brand</th><th>Name</th><th>Price</th><th>Stock</th></tr>"
+	            		        + "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%.2f</td><td>%s</td></tr>"
+	            		    + "</table></html>",
+	            		    rs.getString("product_id"),
+	            		    rs.getString("product_code"),
+	            		    rs.getString("category"),
+	            		    rs.getString("product_brand"),
+	            		    rs.getString("product_name"),
+	            		    rs.getDouble("price"),
+	            		    rs.getDouble("stock")
+	                );
+	            	deleteProductInfo.setText("<html><div style='text-align: center;'>" + productDetails + "</div></html>");
+	                deleteButton.setEnabled(true); // Enable delete button since a product was found
+	            } else {
+	                JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Search Result",
+	                        JOptionPane.INFORMATION_MESSAGE);
+	                deleteProductInfo.setText("");
+	            }
+	        }
+	    } catch (SQLException ex) {
+	        JOptionPane.showMessageDialog(this, "Error loading product details: " + ex.getMessage(), "Database Error",
+	                JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	
 	// Method to delete a product from the database
 	private boolean deleteProduct(int productId) throws NataliaException {
-		try (Connection connection = DatabaseConnector.getConnection();
-				PreparedStatement stmt = connection.prepareStatement("DELETE FROM products WHERE product_id = ?")) {
+	    String query = "DELETE FROM products WHERE product_id = ?";
+	    
+	    try (Connection connection = DatabaseConnector.getConnection();
+	         PreparedStatement stmt = connection.prepareStatement(query)) {
+	        
+	        stmt.setInt(1, productId);
+	        int rowsAffected = stmt.executeUpdate();
+	        return rowsAffected > 0; // Return true if a row was deleted, false if not
 
-			stmt.setInt(1, productId);
-			int rowsAffected = stmt.executeUpdate();
-			// Return true if a row was deleted, false if not
-			return rowsAffected > 0;
-
-		} catch (SQLException ex) {
-			JOptionPane.showMessageDialog(this, "Error deleting product: " + ex.getMessage(), "Database Error",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
+	    } catch (SQLException ex) {
+	        JOptionPane.showMessageDialog(this, "Error deleting product: " + ex.getMessage(), "Database Error",
+	                JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    }
 	}
 
 	
