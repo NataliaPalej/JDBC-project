@@ -19,7 +19,7 @@ create table products (
   product_name      varchar(100)   not null,
   description       text           not null,
   price             decimal(10,2)  not null,
-  discount_percent  decimal(5,2)   default 0.00,
+  discount_percent  decimal(10,2)  default 0.0,
   stock          int            not null,
   stock_status      enum('In Stock', 'Low Stock', 'Out of Stock') as (
         case 
@@ -32,42 +32,42 @@ create table products (
 );
 
 -- Insert Values Into Products 
-INSERT INTO products (product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img) VALUES
-('JS001', 'Face', 'Jeffree Star', 'Magic Star Concealer', 'A full-coverage liquid concealer that provides a smooth, matte finish.', 20.79, 0.00, 20, 'images/JS001.jpg'),
-('HU001', 'Face', 'Huda Beauty', 'Faux Filter Foundation', 'A high-coverage foundation with a soft matte finish and long-lasting wear.', 34.65, 10.00, 10, 'images/HU001.jpg'),
-('BE001', 'Eyes', 'Benefit', 'They\'re Real! Magnet Mascara', 'Mascara that adds volume and length to lashes with a buildable formula.', 24.64, 5.00, 30, 'images/BE001.jpg'),
-('RB001', 'Eyes', 'Rare Beauty', 'Perfect Strokes Mascara', 'A volumizing mascara with a lightweight formula that lifts and curls lashes.', 17.71, 0.00, 15, 'images/RB001.jpg'),
-('IT001', 'Eyes', 'IT Cosmetics', 'Superhero Mascara', 'A mascara that creates dramatic volume and length with just one swipe.', 18.05, 0.00, 40, 'images/IT001.jpg'),
-('HU002', 'Lips', 'Huda Beauty', 'Power Bullet Matte Lipstick', 'A highly pigmented matte lipstick that glides on smoothly and lasts all day.', 20.79, 10.00, 50, 'images/HU002.jpg'),
-('JS002', 'Lips', 'Jeffree Star', 'Velour Liquid Lipstick', 'A highly pigmented, long-lasting liquid lipstick with a matte finish.', 13.71, 15.00, 25, 'images/JS002.jpg'),
-('BE002', 'Accessories', 'Benefit', 'Brow Pencil', 'A precise, easy-to-use brow pencil that fills in brows with natural color.', 13.48, 0.00, 35, 'images/BE002.jpg'),
-('RB002', 'Accessories', 'Rare Beauty', 'Brow Harmony Pencil & Gel', 'A dual-ended pencil and gel for shaping and filling in brows.', 19.25, 5.00, 18, 'images/RB002.jpg'),
-('IT002', 'Accessories', 'IT Cosmetics', 'Heavenly Luxe Brow Power Universal Brow Pencil', 'An award-winning, universal brow pencil that delivers natural-looking brows.', 21.56, 0.00, 22, 'images/IT002.jpg'),
-('HU003', 'Face', 'Huda Beauty', 'Tantour Cream Contour & Bronzer', 'A creamy contour and bronzer that blends seamlessly for a natural-looking glow.', 26.95, 0.00, 20, 'images/HU003.jpg'),
-('JS003', 'Face', 'Jeffree Star', 'Magic Star Setting Powder', 'A translucent setting powder that mattifies and smooths skin.', 18.67, 10.00, 50, 'images/JS003.jpg'),
-('BE003', 'Face', 'Benefit', 'Benetint Cheek & Lip Stain', 'A rose-tinted stain that gives a natural flush to both lips and cheeks.', 29.26, 5.00, 15, 'images/BE003.jpg'),
-('IT003', 'Face', 'IT Cosmetics', 'Bye Bye Under Eye Concealer', 'A full-coverage concealer that brightens and hides dark circles.', 23.10, 0.00, 25, 'images/IT003.jpg'),
-('HU004', 'Eyes', 'Huda Beauty', 'Neon Obsessions Palette', 'A vibrant eyeshadow palette with six intense, neon colors.', 23.10, 0.00, 30, 'images/HU004.jpg'),
-('JS004', 'Eyes', 'Jeffree Star', 'Blood Lust Eyeshadow Palette', 'A collection of bold purple and pink eyeshadows with a luxurious finish.', 41.58, 5.00, 18, 'images/JS004.jpg'),
-('BE004', 'Eyes', 'Benefit', 'Roller Lash Mascara', 'A mascara that curls and lengthens lashes with a unique hook-and-loop brush.', 24.64, 0.00, 40, 'images/BE004.jpg'),
-('RB003', 'Eyes', 'Rare Beauty', 'Kind Words Matte Lip Liner', 'A long-wearing lip liner that complements Rare Beauty lipsticks for a perfect pout.', 13.09, 10.00, 35, 'images/RB003.jpg'),
-('IT004', 'Eyes', 'IT Cosmetics', 'Tightline Full Lash Length Mascara', 'Mascara that extends and defines lashes with a fine precision brush.', 22.33, 0.00, 28, 'images/IT004.jpg'),
-('HU005', 'Lips', 'Huda Beauty', 'Liquid Matte Lipstick', 'A long-lasting, matte liquid lipstick with a smooth, velvet finish.', 20.02, 0.00, 55, 'images/HU005.jpg'),
-('JS005', 'Lips', 'Jeffree Star', 'Velour Lip Scrub', 'A lip scrub that exfoliates and hydrates lips with a sweet flavor.', 11.94, 5.00, 20, 'images/JS005.jpg'),
-('BE005', 'Lips', 'Benefit', 'They\'re Real! Double the Lip Lipstick & Liner', 'A two-in-one lipstick and liner that defines and fills lips in one swipe.', 13.82, 5.00, 18, 'images/BE005.jpg'),
-('RB004', 'Lips', 'Rare Beauty', 'Lip Soufflé Matte Lip Cream', 'A soft, mousse-like lip cream that provides a bold, matte finish.', 17.71, 0.00, 22, 'images/RB004.jpg'),
-('IT005', 'Lips', 'IT Cosmetics', 'Your Lips But Better Waterproof Lip Liner Stain', 'A waterproof lip liner that defines lips and stays put all day.', 16.94, 0.00, 30, 'images/IT005.jpg'),
-('HU006', 'Face', 'Huda Beauty', 'Face & Lip Contour Set', 'A kit that includes everything needed for contouring lips and face with precision.', 33.88, 10.00, 25, 'images/HU006.jpg'),
-('JS006', 'Eyes', 'Jeffree Star', 'Jawbreaker Palette', 'Twenty-four-colour pressed pigment palette.', 55.40, 0.00, 30, 'images/JS006.jpg'),
-('BE006', 'Face', 'Benefit', 'Porefessional Primer', 'A pore-minimizing primer that smooths and mattifies skin before makeup application.', 29.26, 0.00, 40, 'images/BE006.jpg'),
-('RB005', 'Lips', 'Rare Beauty', 'Stay Vulnerable Glossy Lip Balm', 'A moisturizing lip balm with a glossy finish that adds a soft tint.', 16.94, 5.00, 35, 'images/RB005.jpg'),
-('IT006', 'Accessories', 'IT Cosmetics', 'Heavenly Luxe Complexion Perfection Brush #7', 'A brush designed for applying foundation, concealer, and powder.', 34.23, 5.00, 20, 'images/IT006.jpg'),
-('HU007', 'Face', 'Huda Beauty', 'Easy Bake Loose Baking & Setting Powder', 'A loose powder that sets makeup and provides a smooth, matte finish.', 30.76, 0.00, 45, 'images/HU007.jpg'),
-('JS007', 'Face', 'Jeffree Star', 'Supreme Frost Highlighter', 'A radiant highlighter for a glowing finish', 26.91, 0.00, 0, 'images/JS007.jpg'),
-('BE007', 'Eyes', 'Benefit','Badgal Bang Volumising Mascara', 'Mascara for longer and fuller lashes', 24.64, 0.00, 0, 'images/BE007.jpg'), 
-('HU008', 'Eyebrows', 'Huda Beauty', '#BOMBBROWS Full ‘n Fluffy Fiber Gel', 'A clear gel to set your brows in place', 14.63, 0.00, 4, 'images/HB008.jpg'),
-('RB006', 'Lips', 'Rare Beauty', 'Kind Words Lipstick', 'Long-lasting matte finish in a variety of shades', 18.10, 0.00, 3, 'images/RB006.jpg'), 
-('IT007', 'Accessories', 'IT Cosmetics', 'Makeup Brush Set', 'Complete set of high-quality makeup brushes', 38.49, 0.00, 2, 'images/IT007.jpg');
+INSERT INTO products (product_code, category, product_brand, product_name, description, price, stock, product_img) VALUES
+('JS001', 'Face', 'Jeffree Star', 'Magic Star Concealer', 'A full-coverage liquid concealer that provides a smooth, matte finish.', 20.79, 20, 'images/JS001.jpg'),
+('HU001', 'Face', 'Huda Beauty', 'Faux Filter Foundation', 'A high-coverage foundation with a soft matte finish and long-lasting wear.', 34.65, 10, 'images/HU001.jpg'),
+('BE001', 'Eyes', 'Benefit', 'They\'re Real! Magnet Mascara', 'Mascara that adds volume and length to lashes with a buildable formula.', 24.64, 30, 'images/BE001.jpg'),
+('RB001', 'Eyes', 'Rare Beauty', 'Perfect Strokes Mascara', 'A volumizing mascara with a lightweight formula that lifts and curls lashes.', 17.71, 15, 'images/RB001.jpg'),
+('IT001', 'Eyes', 'IT Cosmetics', 'Superhero Mascara', 'A mascara that creates dramatic volume and length with just one swipe.', 18.05, 40, 'images/IT001.jpg'),
+('HU002', 'Lips', 'Huda Beauty', 'Power Bullet Matte Lipstick', 'A highly pigmented matte lipstick that glides on smoothly and lasts all day.', 20.79, 50, 'images/HU002.jpg'),
+('JS002', 'Lips', 'Jeffree Star', 'Velour Liquid Lipstick', 'A highly pigmented, long-lasting liquid lipstick with a matte finish.', 13.71, 25, 'images/JS002.jpg'),
+('BE002', 'Accessories', 'Benefit', 'Brow Pencil', 'A precise, easy-to-use brow pencil that fills in brows with natural color.', 13.48, 35, 'images/BE002.jpg'),
+('RB002', 'Accessories', 'Rare Beauty', 'Brow Harmony Pencil & Gel', 'A dual-ended pencil and gel for shaping and filling in brows.', 19.25, 18, 'images/RB002.jpg'),
+('IT002', 'Accessories', 'IT Cosmetics', 'Heavenly Luxe Brow Power Universal Brow Pencil', 'An award-winning, universal brow pencil that delivers natural-looking brows.', 21.56, 22, 'images/IT002.jpg'),
+('HU003', 'Face', 'Huda Beauty', 'Tantour Cream Contour & Bronzer', 'A creamy contour and bronzer that blends seamlessly for a natural-looking glow.', 26.95, 20, 'images/HU003.jpg'),
+('JS003', 'Face', 'Jeffree Star', 'Magic Star Setting Powder', 'A translucent setting powder that mattifies and smooths skin.', 18.67, 50, 'images/JS003.jpg'),
+('BE003', 'Face', 'Benefit', 'Benetint Cheek & Lip Stain', 'A rose-tinted stain that gives a natural flush to both lips and cheeks.', 29.26, 15, 'images/BE003.jpg'),
+('IT003', 'Face', 'IT Cosmetics', 'Bye Bye Under Eye Concealer', 'A full-coverage concealer that brightens and hides dark circles.', 23.10, 25, 'images/IT003.jpg'),
+('HU004', 'Eyes', 'Huda Beauty', 'Neon Obsessions Palette', 'A vibrant eyeshadow palette with six intense, neon colors.', 23.10, 30, 'images/HU004.jpg'),
+('JS004', 'Eyes', 'Jeffree Star', 'Blood Lust Eyeshadow Palette', 'A collection of bold purple and pink eyeshadows with a luxurious finish.', 41.58, 18, 'images/JS004.jpg'),
+('BE004', 'Eyes', 'Benefit', 'Roller Lash Mascara', 'A mascara that curls and lengthens lashes with a unique hook-and-loop brush.', 24.64, 40, 'images/BE004.jpg'),
+('RB003', 'Eyes', 'Rare Beauty', 'Kind Words Matte Lip Liner', 'A long-wearing lip liner that complements Rare Beauty lipsticks for a perfect pout.', 13.09, 35, 'images/RB003.jpg'),
+('IT004', 'Eyes', 'IT Cosmetics', 'Tightline Full Lash Length Mascara', 'Mascara that extends and defines lashes with a fine precision brush.', 22.33, 28, 'images/IT004.jpg'),
+('HU005', 'Lips', 'Huda Beauty', 'Liquid Matte Lipstick', 'A long-lasting, matte liquid lipstick with a smooth, velvet finish.', 20.02, 55, 'images/HU005.jpg'),
+('JS005', 'Lips', 'Jeffree Star', 'Velour Lip Scrub', 'A lip scrub that exfoliates and hydrates lips with a sweet flavor.', 11.94, 20, 'images/JS005.jpg'),
+('BE005', 'Lips', 'Benefit', 'They\'re Real! Double the Lip Lipstick & Liner', 'A two-in-one lipstick and liner that defines and fills lips in one swipe.', 13.82, 18, 'images/BE005.jpg'),
+('RB004', 'Lips', 'Rare Beauty', 'Lip Soufflé Matte Lip Cream', 'A soft, mousse-like lip cream that provides a bold, matte finish.', 17.71, 22, 'images/RB004.jpg'),
+('IT005', 'Lips', 'IT Cosmetics', 'Your Lips But Better Waterproof Lip Liner Stain', 'A waterproof lip liner that defines lips and stays put all day.', 16.94, 30, 'images/IT005.jpg'),
+('HU006', 'Face', 'Huda Beauty', 'Face & Lip Contour Set', 'A kit that includes everything needed for contouring lips and face with precision.', 33.88, 25, 'images/HU006.jpg'),
+('JS006', 'Eyes', 'Jeffree Star', 'Jawbreaker Palette', 'Twenty-four-colour pressed pigment palette.', 55.40, 30, 'images/JS006.jpg'),
+('BE006', 'Face', 'Benefit', 'Porefessional Primer', 'A pore-minimizing primer that smooths and mattifies skin before makeup application.', 29.26, 40, 'images/BE006.jpg'),
+('RB005', 'Lips', 'Rare Beauty', 'Stay Vulnerable Glossy Lip Balm', 'A moisturizing lip balm with a glossy finish that adds a soft tint.', 16.94, 35, 'images/RB005.jpg'),
+('IT006', 'Accessories', 'IT Cosmetics', 'Heavenly Luxe Complexion Perfection Brush #7', 'A brush designed for applying foundation, concealer, and powder.', 34.23, 20, 'images/IT006.jpg'),
+('HU007', 'Face', 'Huda Beauty', 'Easy Bake Loose Baking & Setting Powder', 'A loose powder that sets makeup and provides a smooth, matte finish.', 30.76, 45, 'images/HU007.jpg'),
+('JS007', 'Face', 'Jeffree Star', 'Supreme Frost Highlighter', 'A radiant highlighter for a glowing finish', 26.91, 0, 'images/JS007.jpg'),
+('BE007', 'Eyes', 'Benefit','Badgal Bang Volumising Mascara', 'Mascara for longer and fuller lashes', 24.64, 0, 'images/BE007.jpg'), 
+('HU008', 'Eyebrows', 'Huda Beauty', '#BOMBBROWS Full ‘n Fluffy Fiber Gel', 'A clear gel to set your brows in place', 14.63, 4, 'images/HB008.jpg'),
+('RB006', 'Lips', 'Rare Beauty', 'Kind Words Lipstick', 'Long-lasting matte finish in a variety of shades', 18.10, 3, 'images/RB006.jpg'), 
+('IT007', 'Accessories', 'IT Cosmetics', 'Makeup Brush Set', 'Complete set of high-quality makeup brushes', 38.49, 2, 'images/IT007.jpg');
 
 select product_code, product_img from products;
 select * from products;
@@ -147,9 +147,9 @@ create table order_details (
 ***    Create Triggers For Auto Updating Rows    ***
 ****************************************************/
 -- Create the trigger for tax_amount and total_order_amount in orders table 
-drop trigger if exists tr_calculate_order_amounts_after_insert;
+drop trigger if exists tr_calculate_order_amount_after_insert;
 delimiter //
-create trigger tr_calculate_order_amounts_after_insert 
+create trigger tr_calculate_order_amount_after_insert 
 after insert on order_details
 for each row
 begin
@@ -201,8 +201,105 @@ select * from products;
 select * from orders;
 select * from order_details;
 
-select * from customers;
-select * from products;
+/* *****************
+*      VIEWS       *
+********************/
+ drop view if exists view_orders;
+ create view view_orders as select o.order_id as "Order ID", o.order_date as "Order Date", p.product_code as "Product Code", p.product_name as "Product Name", od.quantity as "Quantity",
+	od.total_item_cost as "Total Product Cost", p.discount_percent as "Discount",  (od.total_item_cost * (1 - (p.discount_percent / 100))) as "Discounted Price", o.tax_amount as "Tax Amount", 
+    o.total_order_amount as "Total" from order_details od inner join products p on od.product_id = p.product_id inner join orders o on od.order_id = o.order_id where o.order_id = o.order_id;
 
-select * from order_details;
-select * from orders;
+-- View used to get details for each individual order 
+drop view if exists customer_orders_view;
+create view customer_orders_view as
+select c.customer_id, c.first_name, c.last_name, c.address1, c.address2, c.city,
+c.eircode, c.phone_no, c.email_address, o.order_id, o.order_date, o.tax_amount,
+o.total_order_amount, p.product_code, p.product_name, p.discount_percent as discount,
+od.quantity, od.total_item_cost from order_details od join products p on od.product_id = p.product_id
+join orders o on od.order_id = o.order_id join customers c on o.customer_id = c.customer_id;
+
+-- View to get customer details (for invoice)
+drop view if exists customer_details_view;
+create view customer_details_view as select customer_id, first_name, last_name, address1, address2, city, eircode, phone_no, email_address from customers;
+
+drop view if exists sales_by_category_view;
+create view sales_by_category_view as select p.category as "Category", SUM(od.quantity) as "Quantity Sold", SUM(od.total_item_cost) as "Total Sales" 
+from order_details od join products p on od.product_id = p.product_id group by p.category;
+
+drop view if exists sales_by_brand_view;
+create view sales_by_brand_view as select p.product_brand as "Brand", SUM(od.quantity) as "Quantity Sold", SUM(od.total_item_cost) as "Total Sales"
+from order_details od join products p on od.product_id = p.product_id group by p.product_brand;
+
+drop view if exists sales_by_product_view;
+create view sales_by_product_view as select p.product_name as "Name", SUM(od.quantity) as "Quantity Sold", SUM(od.total_item_cost) as "Total Sales"
+from order_details od join products p on od.product_id = p.product_id group by p.product_name;
+
+
+/***********************
+*   STORED PROCEDURES  *
+************************/
+-- Create Order
+drop procedure if exists sp_createOrder;
+delimiter //
+create procedure sp_createOrder(
+	in custID int,
+    out newOrderID int
+)
+begin
+	declare sql_error tinyint default false;
+    declare continue handler for sqlexception
+    set sql_error = true;
+    
+	start transaction;
+		insert into orders (customer_id) values (custID);
+		set newOrderID = LAST_INSERT_ID();
+        if sql_error = false then
+			commit;
+			select concat("Order ID: ", newOrderID, " was created successfully.") as status;
+		else
+			rollback;
+			select "[ERROR] Couldn't create new order" as status;
+		end if;
+end // 
+delimiter ;
+
+-- Add Product to Order 
+drop procedure if exists sp_addProduct;
+delimiter //
+create procedure sp_addProduct(
+	orderID int, 
+	productCode varchar(10), 
+	amount int
+)
+begin
+	declare productID int;
+	declare current_stock int;
+    declare productName varchar(50);
+    declare sql_error tinyint default false;
+    
+    declare continue handler for sqlexception
+    begin
+		set sql_error = true;
+        rollback;
+	end;
+    
+    start transaction;
+    -- Retrieve product_id and stock amount
+	select product_id, product_name, stock into productID, productName, current_stock from products where product_code = productCode;
+
+	if current_stock >= amount then 
+		-- Insert into order_details
+		insert into order_details (order_id, product_id, quantity) values (orderID, productID, amount);
+		-- Update stock 
+		update products set stock = stock-amount where product_id = productID;
+	end if;
+
+    if sql_error = false then
+		commit;
+		select concat(amount, "x ", productName) as status;
+	else
+		rollback;
+		select "[ERROR] Couldn't add item to the order" as status;
+	end if;
+end //
+delimiter ;

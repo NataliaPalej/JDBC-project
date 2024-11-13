@@ -21,17 +21,29 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 @SuppressWarnings("serial")
-public class AdminScreen extends JFrame {
+public class AdminScreen extends JFrame implements ActionListener {
 
 	private JPanel rightPanel;
 	private CardLayout cardLayout;
 	private JTable productsTable;
 	private DefaultTableModel tableModel;
+	private JMenuItem exitOption;
 
 	private JTextField product_code, category, product_brand, product_name, description, price, discount_percent, stock,
 			product_img;
 
 	public AdminScreen(int customer_id) throws NataliaException {
+		
+		JMenuBar menuBar = new JMenuBar();
+		JMenu fileMenu = new JMenu("Options");
+		exitOption = new JMenuItem("Exit");
+		
+		fileMenu.add(exitOption);
+		menuBar.add(fileMenu);
+		setJMenuBar(menuBar);
+		
+		exitOption.addActionListener(this);
+		
 		setTitle("Admin");
 		setSize(900, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -42,6 +54,13 @@ public class AdminScreen extends JFrame {
 
 		setVisible(true);
 	}
+	
+	@Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(exitOption)) {
+            this.dispose(); // Closes only the AdminScreen window
+        }
+    }
 
 	/**********************
 	 * Left Panel Method *
@@ -286,7 +305,7 @@ public class AdminScreen extends JFrame {
 		searchPanel.add(clearButton);
 
 		tableModel = new DefaultTableModel(new String[] { "Product Code", "Product Name", "Category", "Brand",
-				"Description", "Price", "Stock Status", "Image" }, 0) {
+				"Description", "Price", "Stock", "Image" }, 0) {
 			@Override
 			public Class<?> getColumnClass(int column) {
 				return (column == 7) ? Icon.class : Object.class;
@@ -324,7 +343,7 @@ public class AdminScreen extends JFrame {
 
 				tableModel.addRow(new Object[] { rs.getString("product_code"), rs.getString("product_name"),
 						rs.getString("category"), rs.getString("product_brand"), rs.getString("description"),
-						rs.getDouble("price"), rs.getString("stock_status"), icon, });
+						rs.getDouble("price"), rs.getString("stock"), icon, });
 			}
 		} catch (SQLException ex) {
 			JOptionPane.showMessageDialog(this, "Error loading products: " + ex.getMessage(), "Database Error",
@@ -767,7 +786,7 @@ public class AdminScreen extends JFrame {
 	            invoiceArea.setText("No order details found for this Order ID.");
 	            return;
 	        }
-	       
+	        
 	        // Customer and order information (only populated once)
 	        invoice.append(rs.getString("first_name")).append(" ").append(rs.getString("last_name"))
 	               .append("\t\tOrder Date: ").append(rs.getString("order_date")).append("\n")
@@ -980,10 +999,5 @@ public class AdminScreen extends JFrame {
 		discount_percent.setText("");
 		stock.setText("");
 		product_img.setText("");
-	}
-
-	public static void main(String[] args) throws NataliaException {
-		AdminScreen adminScreen = new AdminScreen(1);
-
 	}
 }

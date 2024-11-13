@@ -8,11 +8,11 @@
 
 -- View used to get details for each individual order 
 drop view if exists customer_orders_view;
-create view customer_orders_view as select 
-c.customer_id, c.first_name, c.last_name, c.address1, c.address2, c.city, c.eircode, c.phone_no, c.email_address, 
-o.order_id, o.order_date, o.tax_amount, o.total_order_amount, 
-p.product_code, p.product_name, p.discount_percent as "discount",
-od.quantity, od.total_item_cost from order_details od join products p on od.product_id = p.product_id
+create view customer_orders_view as
+select c.customer_id, c.first_name, c.last_name, c.address1, c.address2, c.city,
+c.eircode, c.phone_no, c.email_address, o.order_id, o.order_date, o.tax_amount,
+o.total_order_amount, p.product_code, p.product_name, p.discount_percent as discount,
+od.quantity, od.total_item_cost join order_details od join products p on od.product_id = p.product_id
 join orders o on od.order_id = o.order_id join customers c on o.customer_id = c.customer_id;
 
 -- View to get customer details (for invoice)
