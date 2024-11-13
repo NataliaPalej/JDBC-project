@@ -104,10 +104,6 @@ public class LoginScreen extends JFrame {
         }
         return null; // Return null if authentication fails
     }
-
-    public static void main(String[] args) {
-        new LoginScreen();
-    }
 }
 
 // Store the logged in user details

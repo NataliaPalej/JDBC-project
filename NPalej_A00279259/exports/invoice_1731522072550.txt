@@ -1,0 +1,21 @@
+Emily Davis		Order Date: 2024-11-07 13:50:00
+404 Cedar Dr
+Unit 3
+Dublin
+D02 5678
+
+Email: emily.davis@example.com
+Phone: 0868765432
+
+			ORDER DETAILS
+---------------------------------------------------------
+Code	Name			Quantity	Total Price
+JS001	Magic Star Concealer	1		20.79
+
+---------------------------------------------------------
+Tax: 4.78
+Discount: 0.00
+---------------------------------------------------------
+Total: 25.57
+
+THANK YOU FOR SHOPPING WITH US!

@@ -159,7 +159,7 @@ public class MakeupStoreContent extends JInternalFrame implements ActionListener
     }
     
     private void processOrder(int customer_id, java.util.List<ProductOrderItem> items) throws NataliaException {
-        String sp_create_order = "{call sp_createOrder(?, ?)}"; 
+        String sp_create_order = "{call sp_create_order(?, ?)}"; 
         int order_id;
 
         try (Connection connection = DatabaseConnector.getConnection();
@@ -180,11 +180,11 @@ public class MakeupStoreContent extends JInternalFrame implements ActionListener
                 return;
             }
 
-            String sp_addProduct = "{call sp_addProduct(?, ?, ?)}"; 
+            String sp_add_product_to_order = "{call sp_add_product_to_order(?, ?, ?)}"; 
             StringBuilder orderStatusMessages = new StringBuilder();
 
             // Loop through items and add each to the same order
-            try (CallableStatement addOrderItemStmt = connection.prepareCall(sp_addProduct)) {
+            try (CallableStatement addOrderItemStmt = connection.prepareCall(sp_add_product_to_order)) {
                 for (ProductOrderItem item : items) {
                     addOrderItemStmt.setInt(1, order_id); 
                     addOrderItemStmt.setString(2, item.getProductCode());
