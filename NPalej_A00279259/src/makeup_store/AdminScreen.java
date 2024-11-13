@@ -23,9 +23,7 @@ public class AdminScreen extends JFrame {
 	private JTable productsTable;
 	private DefaultTableModel tableModel;
 
-	private JTextField product_code, category, product_brand, product_name, description, price, discount_percent, stock,
-			product_img;
-	private JTextField product_code_update, category_update, product_brand_update;
+	private JTextField product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img;
 
 	public AdminScreen(int customer_id) throws NataliaException {
 		setTitle("Admin");
@@ -54,6 +52,8 @@ public class AdminScreen extends JFrame {
 		leftPanel.add(optionButton("VIEW", "ViewProduct"));
 		leftPanel.add(optionButton("UPDATE", "UpdateProduct"));
 		leftPanel.add(optionButton("DELETE", "DeleteProduct"));
+		leftPanel.add(optionButton("DELIVERY DOC", "CustomerOrder"));
+		leftPanel.add(optionButton("SALES", "Sales"));
 		leftPanel.add(new JLabel());
 
 		// Create a wrapper panel for leftPanel with padding
@@ -89,10 +89,12 @@ public class AdminScreen extends JFrame {
 		rightPanel.add(createViewProductPanel(), "ViewProduct");
 		rightPanel.add(createUpdateProductPanel(), "UpdateProduct");
 		rightPanel.add(createDeleteProductPanel(), "DeleteProduct");
+		rightPanel.add(createCustomerOrderPanel(), "CustomerOrder");
+		rightPanel.add(createSalesPanel(), "Sales");
 
 		// Create wrapper panel to add padding
 		JPanel rightPanelPadding = new JPanel(new BorderLayout());
-		rightPanelPadding.setBorder(BorderFactory.createEmptyBorder(50, 20, 50, 20)); // Adds 20px padding to the left
+		rightPanelPadding.setBorder(BorderFactory.createEmptyBorder(50, 20, 50, 20));
 
 		// Add rightPanel to the wrapper panel
 		rightPanelPadding.add(rightPanel, BorderLayout.CENTER);
@@ -542,6 +544,14 @@ public class AdminScreen extends JFrame {
 	 *******************/
 
 	private JPanel createDeleteProductPanel() {
+		
+		/****
+		 * layout needs to be fixed 
+		 * funtionallity works 
+		 * make it nice, like in update product 
+		 * when item is selected to be deleted, then add popup "are you sure you want to delete rpdouct id
+		 * + product name ? this action annot be undone CONFIRM/CANCEL
+		 */
 		JPanel panel = new JPanel(new BorderLayout());
 
 		// Product ID entry specific to this view
@@ -613,6 +623,87 @@ public class AdminScreen extends JFrame {
 		}
 	}
 
+	
+	private JPanel createCustomerOrderPanel() {
+		/**
+		 * create view that will allow to enter order ID 
+		 * once order id entered, press search button to load data 
+		 * 
+		 * show details from customer_delivery_details_view to get customer delivery details 
+		 * and also 
+		 * customer_orders_view to get what customer ordered - make a pretty view, maybe reuse the screen from 
+		 * when customer views their order in the menu which is ViewOrdersContent class
+		 * the goal is to see what customer ordered in an invoice format 
+		 * 
+		 * add export button here 
+		 * */
+		
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		JLabel searchOrderTitle = new JLabel("Find Order");
+		JLabel searchLabel = new JLabel("Enter Order ID: ");
+		JTextField searchField = new JTextField();
+		
+		JButton searchButton = new JButton("SEARCH");
+		JButton clearButton = new JButton("CLEAR");
+		
+		searchButton.addActionListener(e -> {
+			String productIdText = searchField.getText().trim();
+			if (!productIdText.isEmpty()) {
+				try {
+					int productId = Integer.parseInt(productIdText);
+					
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(this, "Please enter a valid numeric Order ID.", "Input Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Order ID cannot be empty.", "\nInput Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		});
+
+		clearButton.addActionListener(e -> {
+			try {
+				loadProducts("SELECT * FROM products");
+				searchField.setText(""); // Clear the search field
+			} catch (NataliaException ex) {
+				JOptionPane.showMessageDialog(this, "Error loading all products: " + ex.getMessage(), "Database Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		});
+
+		searchPanel.add(searchOrderTitle);
+		searchPanel.add(searchLabel);
+		searchPanel.add(searchField);
+		searchPanel.add(searchButton);
+		searchPanel.add(clearButton);
+
+		
+		JPanel panel = new JPanel(new BorderLayout());
+
+		panel.add(searchPanel, BorderLayout.NORTH);
+
+		return panel;
+
+	}
+	
+	private JPanel createSalesPanel() {
+		/**
+		 * create view that will give options to check sales per :
+		 * category 
+		 * brand 
+		 * 
+		 * add export button here 
+		 * */
+		JPanel panel = new JPanel(new BorderLayout());
+		return panel;
+	}
+	
+	
+	
+	
 	public static void main(String[] args) throws NataliaException {
 		AdminScreen adminScreen = new AdminScreen(1);
 

@@ -108,8 +108,8 @@ public class Register extends JFrame {
                 // Register customer 
                 registerCustomer(firstName, lastName, address1, address2, city, eircode, phoneNo, email);
                 // Display successful registration message
-                JOptionPane.showMessageDialog(null, "Welcome " + firstName + "!\nYour registration was successful!\nYour login password is the last four digits of your phone number.", 
-                		"Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Welcome " + firstName + "!\nYour registration was successful!\nYour "
+                		+ "login password is the last four digits of your phone number.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 // Close registration window
                 dispose(); 
             } catch (SQLException | NataliaException ex) {
@@ -124,7 +124,7 @@ public class Register extends JFrame {
         // Establish database connection and insert new customer record
         try (Connection connection = DatabaseConnector.getConnection()) {
             String sql = "INSERT INTO customers (first_name, last_name, address1, address2, city, eircode, phone_no, email_address) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"; // Explicitly set `is_admin` to false for customers
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, firstName);
             statement.setString(2, lastName);
