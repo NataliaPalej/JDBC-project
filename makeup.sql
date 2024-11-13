@@ -42,7 +42,7 @@ INSERT INTO products (product_code, category, product_brand, product_name, descr
 ('JS002', 'Lips', 'Jeffree Star', 'Velour Liquid Lipstick', 'A highly pigmented, long-lasting liquid lipstick with a matte finish.', 13.71, 25, 'images/JS002.jpg'),
 ('BE002', 'Accessories', 'Benefit', 'Brow Pencil', 'A precise, easy-to-use brow pencil that fills in brows with natural color.', 13.48, 35, 'images/BE002.jpg'),
 ('RB002', 'Accessories', 'Rare Beauty', 'Brow Harmony Pencil & Gel', 'A dual-ended pencil and gel for shaping and filling in brows.', 19.25, 18, 'images/RB002.jpg'),
-('IT002', 'Accessories', 'IT Cosmetics', 'Heavenly Luxe Brow Power Universal Brow Pencil', 'An award-winning, universal brow pencil that delivers natural-looking brows.', 21.56, 22, 'images/IT002.jpg'),
+('IT002', 'Accessories', 'IT Cosmetics', 'Luxe Brow Power Brow Pencil', 'An award-winning, universal brow pencil that delivers natural-looking brows.', 21.56, 22, 'images/IT002.jpg'),
 ('HU003', 'Face', 'Huda Beauty', 'Tantour Cream Contour & Bronzer', 'A creamy contour and bronzer that blends seamlessly for a natural-looking glow.', 26.95, 20, 'images/HU003.jpg'),
 ('JS003', 'Face', 'Jeffree Star', 'Magic Star Setting Powder', 'A translucent setting powder that mattifies and smooths skin.', 18.67, 50, 'images/JS003.jpg'),
 ('BE003', 'Face', 'Benefit', 'Benetint Cheek & Lip Stain', 'A rose-tinted stain that gives a natural flush to both lips and cheeks.', 29.26, 15, 'images/BE003.jpg'),
@@ -51,21 +51,21 @@ INSERT INTO products (product_code, category, product_brand, product_name, descr
 ('JS004', 'Eyes', 'Jeffree Star', 'Blood Lust Eyeshadow Palette', 'A collection of bold purple and pink eyeshadows with a luxurious finish.', 41.58, 18, 'images/JS004.jpg'),
 ('BE004', 'Eyes', 'Benefit', 'Roller Lash Mascara', 'A mascara that curls and lengthens lashes with a unique hook-and-loop brush.', 24.64, 40, 'images/BE004.jpg'),
 ('RB003', 'Eyes', 'Rare Beauty', 'Kind Words Matte Lip Liner', 'A long-wearing lip liner that complements Rare Beauty lipsticks for a perfect pout.', 13.09, 35, 'images/RB003.jpg'),
-('IT004', 'Eyes', 'IT Cosmetics', 'Tightline Full Lash Length Mascara', 'Mascara that extends and defines lashes with a fine precision brush.', 22.33, 28, 'images/IT004.jpg'),
+('IT004', 'Eyes', 'IT Cosmetics', 'Tightline Lash Length Mascara', 'Mascara that extends and defines lashes with a fine precision brush.', 22.33, 28, 'images/IT004.jpg'),
 ('HU005', 'Lips', 'Huda Beauty', 'Liquid Matte Lipstick', 'A long-lasting, matte liquid lipstick with a smooth, velvet finish.', 20.02, 55, 'images/HU005.jpg'),
 ('JS005', 'Lips', 'Jeffree Star', 'Velour Lip Scrub', 'A lip scrub that exfoliates and hydrates lips with a sweet flavor.', 11.94, 20, 'images/JS005.jpg'),
-('BE005', 'Lips', 'Benefit', 'They\'re Real! Double the Lip Lipstick & Liner', 'A two-in-one lipstick and liner that defines and fills lips in one swipe.', 13.82, 18, 'images/BE005.jpg'),
+('BE005', 'Lips', 'Benefit', 'Double Lip Lipstick & Liner', 'A two-in-one lipstick and liner that defines and fills lips in one swipe.', 13.82, 18, 'images/BE005.jpg'),
 ('RB004', 'Lips', 'Rare Beauty', 'Lip Soufflé Matte Lip Cream', 'A soft, mousse-like lip cream that provides a bold, matte finish.', 17.71, 22, 'images/RB004.jpg'),
-('IT005', 'Lips', 'IT Cosmetics', 'Your Lips But Better Waterproof Lip Liner Stain', 'A waterproof lip liner that defines lips and stays put all day.', 16.94, 30, 'images/IT005.jpg'),
+('IT005', 'Lips', 'IT Cosmetics', 'Waterproof Lip Liner Stain', 'A waterproof lip liner that defines lips and stays put all day.', 16.94, 30, 'images/IT005.jpg'),
 ('HU006', 'Face', 'Huda Beauty', 'Face & Lip Contour Set', 'A kit that includes everything needed for contouring lips and face with precision.', 33.88, 25, 'images/HU006.jpg'),
 ('JS006', 'Eyes', 'Jeffree Star', 'Jawbreaker Palette', 'Twenty-four-colour pressed pigment palette.', 55.40, 30, 'images/JS006.jpg'),
 ('BE006', 'Face', 'Benefit', 'Porefessional Primer', 'A pore-minimizing primer that smooths and mattifies skin before makeup application.', 29.26, 40, 'images/BE006.jpg'),
-('RB005', 'Lips', 'Rare Beauty', 'Stay Vulnerable Glossy Lip Balm', 'A moisturizing lip balm with a glossy finish that adds a soft tint.', 16.94, 35, 'images/RB005.jpg'),
-('IT006', 'Accessories', 'IT Cosmetics', 'Heavenly Luxe Complexion Perfection Brush #7', 'A brush designed for applying foundation, concealer, and powder.', 34.23, 20, 'images/IT006.jpg'),
-('HU007', 'Face', 'Huda Beauty', 'Easy Bake Loose Baking & Setting Powder', 'A loose powder that sets makeup and provides a smooth, matte finish.', 30.76, 45, 'images/HU007.jpg'),
+('RB005', 'Lips', 'Rare Beauty', 'Stay Vulnerable Lip Balm', 'A moisturizing lip balm with a glossy finish that adds a soft tint.', 16.94, 35, 'images/RB005.jpg'),
+('IT006', 'Accessories', 'IT Cosmetics', 'Complexion Perfection Brush #7', 'A brush designed for applying foundation, concealer, and powder.', 34.23, 20, 'images/IT006.jpg'),
+('HU007', 'Face', 'Huda Beauty', 'Baking & Setting Powder', 'A loose powder that sets makeup and provides a smooth, matte finish.', 30.76, 45, 'images/HU007.jpg'),
 ('JS007', 'Face', 'Jeffree Star', 'Supreme Frost Highlighter', 'A radiant highlighter for a glowing finish', 26.91, 0, 'images/JS007.jpg'),
 ('BE007', 'Eyes', 'Benefit','Badgal Bang Volumising Mascara', 'Mascara for longer and fuller lashes', 24.64, 0, 'images/BE007.jpg'), 
-('HU008', 'Eyebrows', 'Huda Beauty', '#BOMBBROWS Full ‘n Fluffy Fiber Gel', 'A clear gel to set your brows in place', 14.63, 4, 'images/HB008.jpg'),
+('HU008', 'Eyebrows', 'Huda Beauty', '#BOMBBROWS Fiber Gel', 'A clear gel to set your brows in place', 14.63, 4, 'images/HB008.jpg'),
 ('RB006', 'Lips', 'Rare Beauty', 'Kind Words Lipstick', 'Long-lasting matte finish in a variety of shades', 18.10, 3, 'images/RB006.jpg'), 
 ('IT007', 'Accessories', 'IT Cosmetics', 'Makeup Brush Set', 'Complete set of high-quality makeup brushes', 38.49, 2, 'images/IT007.jpg');
 
@@ -144,29 +144,8 @@ create table order_details (
 );
 
 /***************************************************
-***    Create Triggers For Auto Updating Rows    ***
+***  Create Triggers For Auto Updating Prices    ***
 ****************************************************/
--- Create the trigger for tax_amount and total_order_amount in orders table 
-drop trigger if exists tr_calculate_order_amount_after_insert;
-delimiter //
-create trigger tr_calculate_order_amount_after_insert 
-after insert on order_details
-for each row
-begin
-    declare total_amount decimal(10, 2);
-    declare tax_amount decimal(10, 2);
-    
-    -- Calculate order total cost 
-    select sum(total_item_cost) into total_amount from order_details where order_id = NEW.order_id;
-    
-    -- Calculate tax 
-    set tax_amount = total_amount * 0.23;
-    
-    -- Update orders table with values
-    update orders set total_order_amount = total_amount + tax_amount, tax_amount = tax_amount where order_id = new.order_id;
-end //
-delimiter ;
-
 -- Create the trigger for total_item_cost in order_details table 
 drop trigger if exists tr_calculate_total_item_cost_before_insert;
 delimiter //
@@ -179,6 +158,28 @@ begin
     set new.total_item_cost = product_price * new.quantity;
 end //
 delimiter ;
+
+-- Create the trigger for tax_amount and total_order_amount in orders table 
+drop trigger if exists tr_calculate_order_amount_after_insert;
+delimiter //
+create trigger tr_calculate_order_amount_after_insert 
+after insert on order_details
+for each row
+begin
+    declare total_amount decimal(10, 2);
+    declare tax_amount decimal(10, 2);
+    
+    -- Calculate order total cost 
+    select sum(total_item_cost) into total_amount from order_details where order_id = NEW.order_id;
+    -- Calculate tax 
+    set tax_amount = total_amount * 0.23;
+    -- Update orders table with values
+    update orders set total_order_amount = total_amount + tax_amount, tax_amount = tax_amount where order_id = new.order_id;
+end //
+delimiter ;
+
+select * from orders;
+select * from order_details; 
 
 -- Insert Values Into Order Details
 insert into order_details (order_id, product_id, quantity) values
@@ -204,44 +205,47 @@ select * from order_details;
 /* *****************
 *      VIEWS       *
 ********************/
- drop view if exists view_orders;
- create view view_orders as select o.order_id as "Order ID", o.order_date as "Order Date", p.product_code as "Product Code", p.product_name as "Product Name", od.quantity as "Quantity",
-	od.total_item_cost as "Total Product Cost", p.discount_percent as "Discount",  (od.total_item_cost * (1 - (p.discount_percent / 100))) as "Discounted Price", o.tax_amount as "Tax Amount", 
-    o.total_order_amount as "Total" from order_details od inner join products p on od.product_id = p.product_id inner join orders o on od.order_id = o.order_id where o.order_id = o.order_id;
-
 -- View used to get details for each individual order 
 drop view if exists customer_orders_view;
 create view customer_orders_view as
-select c.customer_id, c.first_name, c.last_name, c.address1, c.address2, c.city,
-c.eircode, c.phone_no, c.email_address, o.order_id, o.order_date, o.tax_amount,
+select c.customer_id, c.first_name, c.last_name, c.address1, c.address2, c.city, c.eircode, c.phone_no, c.email_address, o.order_id, o.order_date, o.tax_amount,
 o.total_order_amount, p.product_code, p.product_name, p.discount_percent as discount,
 od.quantity, od.total_item_cost from order_details od join products p on od.product_id = p.product_id
 join orders o on od.order_id = o.order_id join customers c on o.customer_id = c.customer_id;
+
+select * from customer_orders_view where customer_id=3;
 
 -- View to get customer details (for invoice)
 drop view if exists customer_details_view;
 create view customer_details_view as select customer_id, first_name, last_name, address1, address2, city, eircode, phone_no, email_address from customers;
 
+select * from customer_details_view;
+
 drop view if exists sales_by_category_view;
 create view sales_by_category_view as select p.category as "Category", SUM(od.quantity) as "Quantity Sold", SUM(od.total_item_cost) as "Total Sales" 
 from order_details od join products p on od.product_id = p.product_id group by p.category;
+
+select * from sales_by_category_view;
 
 drop view if exists sales_by_brand_view;
 create view sales_by_brand_view as select p.product_brand as "Brand", SUM(od.quantity) as "Quantity Sold", SUM(od.total_item_cost) as "Total Sales"
 from order_details od join products p on od.product_id = p.product_id group by p.product_brand;
 
+select * from sales_by_brand_view;
+
 drop view if exists sales_by_product_view;
 create view sales_by_product_view as select p.product_name as "Name", SUM(od.quantity) as "Quantity Sold", SUM(od.total_item_cost) as "Total Sales"
 from order_details od join products p on od.product_id = p.product_id group by p.product_name;
 
+select * from sales_by_product_view;
 
 /***********************
 *   STORED PROCEDURES  *
 ************************/
 -- Create Order
-drop procedure if exists sp_createOrder;
+drop procedure if exists sp_create_order;
 delimiter //
-create procedure sp_createOrder(
+create procedure sp_create_order(
 	in custID int,
     out newOrderID int
 )
@@ -264,9 +268,9 @@ end //
 delimiter ;
 
 -- Add Product to Order 
-drop procedure if exists sp_addProduct;
+drop procedure if exists sp_add_product_to_order;
 delimiter //
-create procedure sp_addProduct(
+create procedure sp_add_product_to_order (
 	orderID int, 
 	productCode varchar(10), 
 	amount int
@@ -303,3 +307,80 @@ begin
 	end if;
 end //
 delimiter ;
+
+drop procedure if exists sp_add_new_product;
+delimiter //
+create procedure sp_add_new_product (
+    in p_code varchar(10),
+    in p_category varchar(50),
+    in p_brand varchar(50),
+    in p_name varchar(100),
+    in p_description text,
+    in p_price decimal(10, 2),
+    in p_discount decimal(10, 2),
+    in p_stock int,
+    in p_imgpath varchar(255)
+)
+begin
+    declare sql_error tinyint default false;
+    declare continue handler for sqlexception
+    begin
+        set sql_error = true;
+        rollback;
+    end;
+
+    start transaction;
+    -- Insert product data
+    insert into products (product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img)
+    values (p_code, p_category, p_brand, p_name, p_description, p_price, ifnull(p_discount, 0.00), p_stock, p_imgpath);
+
+    -- Commit or rollback based on the success of the insertion
+    if sql_error = false then
+        commit;
+        select concat("Product ", p_code, " added successfully.") as status;
+    else
+        select "[ERROR] Product could not be added." as status;
+    end if;
+end //
+delimiter ;
+
+drop procedure if exists sp_update_product;
+delimiter //
+create procedure sp_update_product (
+    in p_product_id int,
+    in p_product_code varchar(10),
+    in p_category varchar(50),
+    in p_product_brand varchar(50),
+    in p_product_name varchar(100),
+    in p_description text,
+    in p_price decimal(10, 2),
+    in p_discount_percent decimal(10, 2),
+    in p_stock int,
+    in p_product_img varchar(255)
+)
+begin
+    declare sql_error tinyint default false;
+    declare continue handler for sqlexception
+    begin
+        set sql_error = true;
+        rollback;
+    end;
+    
+    start transaction;
+
+    -- Update product details
+    update products set product_code = p_product_code, category = p_category,
+        product_brand = p_product_brand, product_name = p_product_name,
+        description = p_description, price = p_price, discount_percent = ifnull(p_discount_percent, 0.00),
+        stock = p_stock, product_img = p_product_img where product_id = p_product_id;
+
+    if sql_error = false then
+        commit;
+        select concat("Product ID ", p_product_id, " updated successfully.") as status;
+    else
+        select "[ERROR] Product could not be updated." as status;
+    end if;
+end //
+delimiter ;
+
+select * from products;

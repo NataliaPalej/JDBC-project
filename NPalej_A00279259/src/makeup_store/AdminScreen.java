@@ -78,7 +78,7 @@ public class AdminScreen extends JFrame implements ActionListener {
 		leftPanel.add(optionButton("VIEW", "ViewProduct"));
 		leftPanel.add(optionButton("UPDATE", "UpdateProduct"));
 		leftPanel.add(optionButton("DELETE", "DeleteProduct"));
-		leftPanel.add(optionButton("DELIVERY DOC", "CustomerOrder"));
+		leftPanel.add(optionButton("INVOICE", "CustomerOrder"));
 		leftPanel.add(optionButton("VIEW SALES", "Sales"));
 		leftPanel.add(new JLabel());
 
@@ -238,11 +238,12 @@ public class AdminScreen extends JFrame implements ActionListener {
 	}
 
 	private boolean saveProductToDatabase(String code, String category, String brand, String name, String desc,
-			BigDecimal price, BigDecimal discount, int stock, String imgPath) throws SQLException, NataliaException {
-		String query = "INSERT INTO products (product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+            BigDecimal price, BigDecimal discount, int stock, String imgPath) throws SQLException, NataliaException {
+	
+		String sp_add_new_product = "{CALL sp_add_new_product(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+		
 		try (Connection connection = DatabaseConnector.getConnection();
-				PreparedStatement stmt = connection.prepareStatement(query)) {
+				PreparedStatement stmt = connection.prepareStatement(sp_add_new_product)) {
 
 			// Set parameters for the prepared statement
 			stmt.setString(1, code);
@@ -255,9 +256,13 @@ public class AdminScreen extends JFrame implements ActionListener {
 			stmt.setInt(8, stock);
 			stmt.setString(9, imgPath);
 
-			int rowsAffected = stmt.executeUpdate();
-			// Return true if a row was inserted
-			return rowsAffected > 0;
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next() && rs.getString(1).contains("successfully")) {
+			    return true;
+			} else {
+			    return false;
+			}
 		}
 	}
 
@@ -354,12 +359,12 @@ public class AdminScreen extends JFrame implements ActionListener {
 	// Method to load a specific product by product ID
 	private void searchProductById(int productId) throws NataliaException {
 		String query = "SELECT * FROM products WHERE product_id = ?";
-		tableModel.setRowCount(0); // Clear previous data
+		tableModel.setRowCount(0); 
 
 		try (Connection connection = DatabaseConnector.getConnection();
 				PreparedStatement stmt = connection.prepareStatement(query)) {
 
-			stmt.setInt(1, productId); // Set product_id in query
+			stmt.setInt(1, productId); 
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
 					// Load and scale the image directly from path
@@ -549,24 +554,32 @@ public class AdminScreen extends JFrame implements ActionListener {
 	// Method to update product details in the database
 	private boolean updateProductDetails(int productId, String productCode, String category, String brand, String name,
 			String description, String price, String discount, String stock, String img) throws NataliaException {
-		String query = "UPDATE products SET product_code=?, category=?, product_brand=?, product_name=?, description=?, price=?, discount_percent=?, stock=?, product_img=? WHERE product_id=?";
+		String sp_update_product = "{CALL sp_update_product(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
 		try (Connection connection = DatabaseConnector.getConnection();
-				PreparedStatement stmt = connection.prepareStatement(query)) {
+				PreparedStatement stmt = connection.prepareStatement(sp_update_product)) {
 
 			// Set parameters for the update query
-			stmt.setString(1, productCode);
-			stmt.setString(2, category);
-			stmt.setString(3, brand);
-			stmt.setString(4, name);
-			stmt.setString(5, description);
-			stmt.setString(6, price);
-			stmt.setString(7, discount);
-			stmt.setString(8, stock);
-			stmt.setString(9, img);
-			stmt.setInt(10, productId);
+			stmt.setInt(1, productId);
+	        stmt.setString(2, productCode);
+	        stmt.setString(3, category);
+	        stmt.setString(4, brand);
+	        stmt.setString(5, name);
+	        stmt.setString(6, description);
+	        stmt.setBigDecimal(7, new BigDecimal(price));
+	        stmt.setBigDecimal(8, new BigDecimal(discount));
+	        stmt.setInt(9, Integer.parseInt(stock));
+	        stmt.setString(10, img);
 
-			return stmt.executeUpdate() > 0;
+	        ResultSet rs = stmt.executeQuery();
+	        
+	        if (rs.next() && rs.getString("status").contains("updated successfully")) {
+	            return true;
+	        } else {
+	            JOptionPane.showMessageDialog(this, "Failed to update product. Please check your inputs.", "Error", JOptionPane.ERROR_MESSAGE);
+	            return false;
+	        }
+	        
 		} catch (SQLException ex) {
 			JOptionPane.showMessageDialog(this, "Error updating product: " + ex.getMessage(), "Database Error",
 					JOptionPane.ERROR_MESSAGE);
