@@ -22,8 +22,10 @@ public class AdminScreen extends JFrame {
 	private JTextField product_id;
 	private JTable productsTable;
 	private DefaultTableModel tableModel;
-	
-	private JTextField product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img;
+
+	private JTextField product_code, category, product_brand, product_name, description, price, discount_percent, stock,
+			product_img;
+	private JTextField product_code_update, category_update, product_brand_update;
 
 	public AdminScreen(int customer_id) throws NataliaException {
 		setTitle("Admin");
@@ -56,8 +58,7 @@ public class AdminScreen extends JFrame {
 
 		// Create a wrapper panel for leftPanel with padding
 		JPanel leftPanelPadding = new JPanel(new BorderLayout());
-		leftPanelPadding.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20)); // Adds 20px padding to the left and
-																					// right
+		leftPanelPadding.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
 
 		// Add leftPanel to the wrapper
 		leftPanelPadding.add(leftPanel, BorderLayout.CENTER);
@@ -193,16 +194,8 @@ public class AdminScreen extends JFrame {
 							+ "</div></html>";
 					JOptionPane.showMessageDialog(null, message, "Success", JOptionPane.INFORMATION_MESSAGE);
 
-					// Clear fields 
-					product_code.setText("");
-			        category.setText("");
-			        product_brand.setText("");
-			        product_name.setText("");
-			        description.setText("");
-			        price.setText("");
-			        discount_percent.setText("");
-			        stock.setText("");
-			        product_img.setText("");
+					clearFields();
+					loadProducts("SELECT * FROM products");
 				} else {
 					JOptionPane.showMessageDialog(null, "Failed to add product. Please check your inputs.", "Error",
 							JOptionPane.ERROR_MESSAGE);
@@ -215,7 +208,7 @@ public class AdminScreen extends JFrame {
 			}
 		}
 	}
-	
+
 	private boolean saveProductToDatabase(String code, String category, String brand, String name, String desc,
 			BigDecimal price, BigDecimal discount, int stock, String imgPath) throws SQLException, NataliaException {
 		String query = "INSERT INTO products (product_code, category, product_brand, product_name, description, price, discount_percent, stock, product_img) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -236,52 +229,54 @@ public class AdminScreen extends JFrame {
 
 			int rowsAffected = stmt.executeUpdate();
 			// Return true if a row was inserted
-			return rowsAffected > 0; 
+			return rowsAffected > 0;
 		}
 	}
 
 	/*******************
-	 *  View Products  *
+	 * View Products *
 	 *******************/
 	private JPanel createViewProductPanel() throws NataliaException {
 		JPanel searchPanel = new JPanel();
-	    searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		
+		searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
 		JLabel searchLabel = new JLabel("Enter Product ID:");
-	    JTextField searchField = new JTextField(10); 
-	    JButton searchButton = new JButton("SEARCH");
-	    JButton clearButton = new JButton("CLEAR");
-	    
-	    searchButton.addActionListener(e -> {
-	        String productIdText = searchField.getText().trim();
-	        if (!productIdText.isEmpty()) {
-	            try {
-	                int productId = Integer.parseInt(productIdText);
-	                searchProductById(productId);
-	            } catch (NumberFormatException | NataliaException ex) {
-	                JOptionPane.showMessageDialog(this, "Please enter a valid numeric Product ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
-	            }
-	        } else {
-	            JOptionPane.showMessageDialog(this, "Product ID cannot be empty.", "Input Error", JOptionPane.WARNING_MESSAGE);
-	        }
-	    });
-	    
-	    clearButton.addActionListener(e -> {
-	        try {
-	            loadProducts("SELECT * FROM products");
-	            searchField.setText(""); // Clear the search field
-	        } catch (NataliaException ex) {
-	            JOptionPane.showMessageDialog(this, "Error loading all products: " + ex.getMessage(), "Database Error",
-	                    JOptionPane.ERROR_MESSAGE);
-	        }
-	    });
-	    
-	    searchPanel.add(searchLabel);
-	    searchPanel.add(searchField);
-	    searchPanel.add(searchButton);
-	    searchPanel.add(clearButton);
-	    
-	    tableModel = new DefaultTableModel(new String[] { "Product Code", "Product Name", "Category", "Brand",
+		JTextField searchField = new JTextField(10);
+		JButton searchButton = new JButton("SEARCH");
+		JButton clearButton = new JButton("CLEAR");
+
+		searchButton.addActionListener(e -> {
+			String productIdText = searchField.getText().trim();
+			if (!productIdText.isEmpty()) {
+				try {
+					int productId = Integer.parseInt(productIdText);
+					searchProductById(productId);
+				} catch (NumberFormatException | NataliaException ex) {
+					JOptionPane.showMessageDialog(this, "Please enter a valid numeric Product ID.", "Input Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Product ID cannot be empty.", "\nInput Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		});
+
+		clearButton.addActionListener(e -> {
+			try {
+				loadProducts("SELECT * FROM products");
+				searchField.setText(""); // Clear the search field
+			} catch (NataliaException ex) {
+				JOptionPane.showMessageDialog(this, "Error loading all products: " + ex.getMessage(), "Database Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		});
+
+		searchPanel.add(searchLabel);
+		searchPanel.add(searchField);
+		searchPanel.add(searchButton);
+		searchPanel.add(clearButton);
+
+		tableModel = new DefaultTableModel(new String[] { "Product Code", "Product Name", "Category", "Brand",
 				"Description", "Price", "Stock Status", "Image" }, 0) {
 			@Override
 			public Class<?> getColumnClass(int column) {
@@ -294,7 +289,7 @@ public class AdminScreen extends JFrame {
 
 		JScrollPane scrollPane = new JScrollPane(productsTable);
 		JPanel panel = new JPanel(new BorderLayout());
-		
+
 		panel.add(searchPanel, BorderLayout.NORTH);
 		panel.add(scrollPane, BorderLayout.CENTER);
 
@@ -327,33 +322,34 @@ public class AdminScreen extends JFrame {
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
+
 	// Method to load a specific product by product ID
 	private void searchProductById(int productId) throws NataliaException {
-	    String query = "SELECT * FROM products WHERE product_id = ?";
-	    tableModel.setRowCount(0); // Clear previous data
+		String query = "SELECT * FROM products WHERE product_id = ?";
+		tableModel.setRowCount(0); // Clear previous data
 
-	    try (Connection connection = DatabaseConnector.getConnection();
-	         PreparedStatement stmt = connection.prepareStatement(query)) {
-	        
-	        stmt.setInt(1, productId); // Set product_id in query
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                // Load and scale the image directly from path
-	                ImageIcon icon = new ImageIcon(new ImageIcon(rs.getString("product_img")).getImage()
-	                        .getScaledInstance(70, 70, Image.SCALE_SMOOTH));
+		try (Connection connection = DatabaseConnector.getConnection();
+				PreparedStatement stmt = connection.prepareStatement(query)) {
 
-	                tableModel.addRow(new Object[] { rs.getString("product_code"), rs.getString("product_name"),
-	                        rs.getString("category"), rs.getString("product_brand"), rs.getString("description"),
-	                        rs.getDouble("price"), rs.getString("stock_status"), icon });
-	            } else {
-	                JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Search Result", JOptionPane.INFORMATION_MESSAGE);
-	            }
-	        }
-	    } catch (SQLException ex) {
-	        JOptionPane.showMessageDialog(this, "Error searching product: " + ex.getMessage(), "Database Error",
-	                JOptionPane.ERROR_MESSAGE);
-	    }
+			stmt.setInt(1, productId); // Set product_id in query
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					// Load and scale the image directly from path
+					ImageIcon icon = new ImageIcon(new ImageIcon(rs.getString("product_img")).getImage()
+							.getScaledInstance(70, 70, Image.SCALE_SMOOTH));
+
+					tableModel.addRow(new Object[] { rs.getString("product_code"), rs.getString("product_name"),
+							rs.getString("category"), rs.getString("product_brand"), rs.getString("description"),
+							rs.getDouble("price"), rs.getString("stock_status"), icon });
+				} else {
+					JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Search Result",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+		} catch (SQLException ex) {
+			JOptionPane.showMessageDialog(this, "Error searching product: " + ex.getMessage(), "Database Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	/******************
@@ -363,23 +359,21 @@ public class AdminScreen extends JFrame {
 		JPanel panel = new JPanel(new BorderLayout());
 		JPanel productPanel = new JPanel(new GridLayout(11, 2, 5, 5));
 
-		// Product ID entry specific to this view
-		// JPanel topPanel = new JPanel();
 		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 
-		// Title Label
+		// Title label
 		String updateTitle = "<html><div style='text-align: center; font-size: 16px; font-family: DialogInput;'>Update Product</div></html>";
 		JLabel titleLabel = new JLabel(updateTitle);
 		titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		topPanel.add(titleLabel);
 
-		// Product ID Label and Input Field
-		JPanel productIdPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Center align this line
+		// Product ID label and input field
+		JPanel productIdPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		productIdPanel.add(new JLabel("Enter Product ID:"));
-		product_id = new JTextField(10);
-		productIdPanel.add(product_id);
-		JButton searchButton = new JButton("Search");
+		JTextField productToUpdate = new JTextField(10);
+		productIdPanel.add(productToUpdate);
+		JButton searchButton = new JButton("SEARCH");
 		productIdPanel.add(searchButton);
 
 		// Add to topPanel
@@ -426,9 +420,54 @@ public class AdminScreen extends JFrame {
 		JButton updateButton = new JButton("Update");
 		productPanel.add(updateButton);
 
+		searchButton.addActionListener(e -> {
+			String productIdText = productToUpdate.getText();
+			if (!productIdText.isEmpty()) {
+				try {
+					System.out.println("AdminScreen :: productIdText " + productIdText);
+					int productId = Integer.parseInt(productIdText);
+
+					String query = "SELECT * FROM products WHERE product_id = ?";
+
+					try (Connection connection = DatabaseConnector.getConnection();
+							PreparedStatement stmt = connection.prepareStatement(query)) {
+
+						stmt.setInt(1, productId);
+						try (ResultSet rs = stmt.executeQuery()) {
+							if (rs.next()) {
+								// Populate fields with product details from the result set
+								product_code.setText(rs.getString("product_code"));
+								category.setText(rs.getString("category"));
+								product_brand.setText(rs.getString("product_brand"));
+								product_name.setText(rs.getString("product_name"));
+								description.setText(rs.getString("description"));
+								price.setText(rs.getBigDecimal("price").toString());
+								discount_percent.setText(rs.getBigDecimal("discount_percent").toString());
+								stock.setText(String.valueOf(rs.getInt("stock")));
+								product_img.setText(rs.getString("product_img"));
+							} else {
+								JOptionPane.showMessageDialog(this, "No product found with ID: " + productId,
+										"Search Result", JOptionPane.INFORMATION_MESSAGE);
+							}
+						}
+					} catch (SQLException ex) {
+						JOptionPane.showMessageDialog(this, "Error loading product details: " + ex.getMessage(),
+								"Database Error", JOptionPane.ERROR_MESSAGE);
+					}
+
+				} catch (NumberFormatException | NataliaException ex) {
+					JOptionPane.showMessageDialog(this, "Please enter a valid numeric Product ID.", "Input Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Product ID cannot be empty.", "Input Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		});
+
 		// Action listener for the Update button
 		updateButton.addActionListener(e -> {
-			String productIdText = product_id.getText().trim();
+			String productIdText = productToUpdate.getText();
 			if (!productIdText.isEmpty()) {
 				try {
 					int productId = Integer.parseInt(productIdText);
@@ -449,6 +488,10 @@ public class AdminScreen extends JFrame {
 							discount, stockText, img)) {
 						JOptionPane.showMessageDialog(this, "Product ID " + productId + " updated successfully.",
 								"Success", JOptionPane.INFORMATION_MESSAGE);
+						
+						clearFields();
+						
+						loadProducts("SELECT * FROM products");
 					} else {
 						JOptionPane.showMessageDialog(this, "No product found with ID: " + productId, "Update Failed",
 								JOptionPane.WARNING_MESSAGE);
@@ -487,12 +530,9 @@ public class AdminScreen extends JFrame {
 			stmt.setString(9, img);
 			stmt.setInt(10, productId);
 
-			int rowsAffected = stmt.executeUpdate();
-			return rowsAffected > 0; // Return true if a row was updated, false if not
-
+			return stmt.executeUpdate() > 0;
 		} catch (SQLException ex) {
-			JOptionPane.showMessageDialog(this, "Error updating product: " + ex.getMessage(), "Database Error",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Error updating product: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 	}
@@ -576,6 +616,18 @@ public class AdminScreen extends JFrame {
 	public static void main(String[] args) throws NataliaException {
 		AdminScreen adminScreen = new AdminScreen(1);
 
+	}
+	
+	private void clearFields() {
+	    product_code.setText("");
+	    category.setText("");
+	    product_brand.setText("");
+	    product_name.setText("");
+	    description.setText("");
+	    price.setText("");
+	    discount_percent.setText("");
+	    stock.setText("");
+	    product_img.setText("");
 	}
 
 }
