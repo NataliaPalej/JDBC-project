@@ -1,0 +1,21 @@
+Adrian Sypos				Order Date: 2024-11-02 12:30:00
+456 Main Rd
+null
+Cork
+T12 3456
+
+Email: john.doe@example.com
+Phone: 0876543210
+
+			ORDER DETAILS
+---------------------------------------------------------
+Product Code    Product Name       Quantity    Total Price
+BE001        Benefit They're Real! Lengthening Mascara        2        54.0
+
+---------------------------------------------------------
+Tax: 12.42
+Discount: 5.00
+---------------------------------------------------------
+Total: 66.42
+
+THANK YOU FOR SHOPPING WITH US!

@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
@@ -24,7 +25,6 @@ public class AdminScreen extends JFrame {
 
 	private JPanel rightPanel;
 	private CardLayout cardLayout;
-	private JTextField product_id;
 	private JTable productsTable;
 	private DefaultTableModel tableModel;
 
@@ -694,68 +694,146 @@ public class AdminScreen extends JFrame {
 	}
 
 	private JPanel createCustomerOrderPanel() {
-		/**
-		 * create view that will allow to enter order ID once order id entered, press
-		 * search button to load data
-		 * 
-		 * show details from customer_delivery_details_view to get customer delivery
-		 * details and also customer_orders_view to get what customer ordered - make a
-		 * pretty view, maybe reuse the screen from when customer views their order in
-		 * the menu which is ViewOrdersContent class the goal is to see what customer
-		 * ordered in an invoice format
-		 * 
-		 * add export button here
-		 */
-
-		JPanel searchPanel = new JPanel();
-		searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-		JLabel searchOrderTitle = new JLabel("Find Order");
-		JLabel searchLabel = new JLabel("Enter Order ID: ");
-		JTextField searchField = new JTextField();
-
-		JButton searchButton = new JButton("SEARCH");
-		JButton clearButton = new JButton("CLEAR");
-
-		searchButton.addActionListener(e -> {
-			String productIdText = searchField.getText().trim();
-			if (!productIdText.isEmpty()) {
-				try {
-					int productId = Integer.parseInt(productIdText);
-
-				} catch (NumberFormatException ex) {
-					JOptionPane.showMessageDialog(this, "Please enter a valid numeric Order ID.", "Input Error",
-							JOptionPane.ERROR_MESSAGE);
-				}
-			} else {
-				JOptionPane.showMessageDialog(this, "Order ID cannot be empty.", "\nInput Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		});
-
-		clearButton.addActionListener(e -> {
-			try {
-				loadProducts("SELECT * FROM products");
-				searchField.setText(""); // Clear the search field
-			} catch (NataliaException ex) {
-				JOptionPane.showMessageDialog(this, "Error loading all products: " + ex.getMessage(), "Database Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		});
-
-		searchPanel.add(searchOrderTitle);
-		searchPanel.add(searchLabel);
-		searchPanel.add(searchField);
-		searchPanel.add(searchButton);
-		searchPanel.add(clearButton);
-
 		JPanel panel = new JPanel(new BorderLayout());
+		
+	    // Search panel
+	    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    JLabel searchLabel = new JLabel("Enter Order ID: ");
+	    JTextField searchField = new JTextField(10);
+	    JButton searchButton = new JButton("SEARCH");
+	    JButton clearButton = new JButton("CLEAR");
+	    JButton exportButton = new JButton("EXPORT");
 
-		panel.add(searchPanel, BorderLayout.NORTH);
+	    searchPanel.add(searchLabel);
+	    searchPanel.add(searchField);
+	    searchPanel.add(searchButton);
+	    searchPanel.add(clearButton);
+	    searchPanel.add(exportButton);
 
-		return panel;
+	    // Text area to display order details
+	    JTextArea invoiceArea = new JTextArea(20, 50);
+	    invoiceArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+	    invoiceArea.setEditable(false);
+	    JScrollPane scrollPane = new JScrollPane(invoiceArea);
+
+	    panel.add(searchPanel, BorderLayout.NORTH);
+	    panel.add(scrollPane, BorderLayout.CENTER);
+
+	    // Action listener for SEARCH button
+	    searchButton.addActionListener(e -> {
+	        String orderIdText = searchField.getText().trim();
+	        if (!orderIdText.isEmpty()) {
+	            try {
+	                int orderId = Integer.parseInt(orderIdText);
+	                displayInvoice(orderId, invoiceArea);
+	            } catch (NumberFormatException | NataliaException ex) {
+	                JOptionPane.showMessageDialog(this, "Please enter a valid numeric Order ID.", "Input Error",
+	                        JOptionPane.ERROR_MESSAGE);
+	            }
+	        } else {
+	            JOptionPane.showMessageDialog(this, "Order ID cannot be empty.", "Input Error",
+	                    JOptionPane.WARNING_MESSAGE);
+	        }
+	    });
+
+	    // Action listener for CLEAR button
+	    clearButton.addActionListener(e -> {
+	        searchField.setText("");
+	        invoiceArea.setText("");
+	    });
+
+	    // Action listener for EXPORT button
+	    exportButton.addActionListener(e -> exportInvoice(invoiceArea.getText()));
+
+	    return panel;
 
 	}
+	
+	private void displayInvoice(int orderId, JTextArea invoiceArea) throws NataliaException {
+	    try (Connection connection = DatabaseConnector.getConnection();
+	         Statement stmt = connection.createStatement()) {
+
+	        // Fetch order and customer details from the view
+	        String query = "SELECT * FROM customer_orders_view WHERE order_id = " + orderId;
+	        ResultSet rs = stmt.executeQuery(query);
+	        
+	        System.out.println(query);
+
+	        // Format the result as an invoice
+	        StringBuilder invoice = new StringBuilder();
+	        
+	        // Check if the ResultSet contains any data
+	        if (!rs.next()) {
+	            invoiceArea.setText("No order details found for this Order ID.");
+	            return;
+	        }
+
+	        // Customer and order information (only populated once)
+	        invoice.append(rs.getString("first_name")).append(" ").append(rs.getString("last_name"))
+	               .append("\t\t\t\tOrder Date: ").append(rs.getString("order_date")).append("\n")
+	               .append(rs.getString("address1")).append("\n")
+	               .append(rs.getString("address2")).append("\n")
+	               .append(rs.getString("city")).append("\n")
+	               .append(rs.getString("eircode")).append("\n\n")
+	               .append("Email: ").append(rs.getString("email_address")).append("\n")
+	               .append("Phone: ").append(rs.getString("phone_no")).append("\n\n")
+	               .append("\t\t\tORDER DETAILS\n")
+	               .append("---------------------------------------------------------\n")
+	               .append("Product Code    Product Name       Quantity    Total Price\n")
+	               .append(rs.getString("product_code")).append("        ")
+	               .append(rs.getString("product_name")).append("        ")
+	               .append(rs.getInt("quantity")).append("        ")
+	               .append(rs.getDouble("total_item_cost")).append("\n");
+
+	        
+	        System.out.println("\n\ninvoice after dowhile::\n" + invoice);
+	        
+	        double taxAmount = rs.getDouble("tax_amount");
+	        double totalOrderAmount = rs.getDouble("total_order_amount");
+	        double discount = rs.getDouble("discount");
+
+	        // Append totals to the invoice
+	        invoice.append("\n")
+	               .append("---------------------------------------------------------\n")
+	               .append(String.format("Tax: %.2f\n", taxAmount))
+	               .append(String.format("Discount: %.2f\n", discount))
+	               .append("---------------------------------------------------------\n")
+	               .append(String.format("Total: %.2f\n\n", totalOrderAmount))
+	               .append("THANK YOU FOR SHOPPING WITH US!");
+	        
+	        System.out.println("\n\ninvoice after numeric values::\n" + invoice);
+
+	        // Display the formatted invoice in the text area
+	        invoiceArea.setText(invoice.toString());
+
+	    } catch (SQLException ex) {
+	        JOptionPane.showMessageDialog(this, "Error fetching order details: " + ex.getMessage(), "Database Error",
+	                JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	
+	private void exportInvoice(String invoiceText) {
+	    if (invoiceText.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "No invoice to export.", "Export Error", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+	    try {
+	        // Ensure export directory exists
+	        File exportDir = new File("exports");
+	        if (!exportDir.exists()) exportDir.mkdirs();
+
+	        // Save invoice to a file
+	        String filePath = "exports/invoice_" + System.currentTimeMillis() + ".txt";
+	        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+	            writer.write(invoiceText);
+	        }
+
+	        JOptionPane.showMessageDialog(this, "Invoice exported successfully to " + filePath, "Export Successful", JOptionPane.INFORMATION_MESSAGE);
+	    } catch (IOException ex) {
+	        JOptionPane.showMessageDialog(this, "Error exporting invoice: " + ex.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	
 
 	private JPanel createSalesPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
@@ -808,8 +886,7 @@ public class AdminScreen extends JFrame {
 
 		// Action for exportButton
 		exportButton.addActionListener(e -> {
-
-			// Get selected filter option (category)
+			// Get selectedOption
 			String selectedOption = (String) filterOptions.getSelectedItem();
 
 			// Check if option selected
@@ -832,24 +909,25 @@ public class AdminScreen extends JFrame {
 				String fileName = selectedOption.toLowerCase() + "-sales-" + currentDate + ".csv";
 				String filePath = "exports/" + fileName;
 
-				FileWriter csvWriter = new FileWriter(filePath);
+				FileWriter outputFile = new FileWriter(filePath);
 
 				// Write headers
 				for (int i = 0; i < tableModel.getColumnCount(); i++) {
-					csvWriter.append(tableModel.getColumnName(i)).append(",");
+					outputFile.append(tableModel.getColumnName(i)).append(",");
 				}
-				csvWriter.append("\n");
+				outputFile.append("\n");
 
 				// Write data rows
 				for (int row = 0; row < tableModel.getRowCount(); row++) {
 					for (int col = 0; col < tableModel.getColumnCount(); col++) {
-						csvWriter.append(tableModel.getValueAt(row, col).toString()).append(",");
+						outputFile.append(tableModel.getValueAt(row, col).toString()).append(",");
 					}
-					csvWriter.append("\n");
+					outputFile.append("\n");
 				}
-
-				csvWriter.flush();
-				csvWriter.close();
+				// Write any remaining data to the file
+				outputFile.flush();
+				// Close the file
+				outputFile.close();
 
 				JOptionPane.showMessageDialog(panel, "Data exported successfully to " + filePath, "Export Successful",
 						JOptionPane.INFORMATION_MESSAGE);
@@ -911,5 +989,4 @@ public class AdminScreen extends JFrame {
 		AdminScreen adminScreen = new AdminScreen(1);
 
 	}
-
 }
