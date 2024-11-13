@@ -151,16 +151,32 @@ public class ViewOrdersContent extends JFrame {
             stmt.setInt(1, customer_id);
             stmt.setInt(2, order_id);
             ResultSet rs = stmt.executeQuery();
-
+            
             while (rs.next()) {
                 detailsMessage.append("<tr>")
                         .append("<td>").append(rs.getString("product_code")).append("</td>")
                         .append("<td>").append(rs.getString("product_name")).append("</td>")
                         .append("<td style='text-align: center;'>").append(rs.getInt("quantity")).append("</td>")
-                        .append("<td style='text-align: right;'>").append(String.format("%.2f", rs.getDouble("total_item_cost"))).append("</td>")
-                        .append("</tr>");
+                        .append("<td style='text-align: right;'>").append(String.format("%.2f", rs.getDouble("total_item_cost"))).append("</td>");
+                        
             }
-
+            
+            PreparedStatement getTax = connection.prepareStatement("SELECT tax_amount, total_order_amount FROM customer_orders_view WHERE customer_id=? AND order_id=?");
+            getTax.setInt(1, customer_id);
+            getTax.setInt(2, order_id);
+            ResultSet rsGetTax = getTax.executeQuery();
+            
+            if (rsGetTax.next()) {
+                detailsMessage.append("<tr><td colspan='3' style='text-align: right;'><strong>Tax:</strong></td>")
+                              .append("<td style='text-align: right;'>")
+                              .append(String.format("%.2f", rsGetTax.getDouble("tax_amount")))
+                              .append("</td></tr>");
+                detailsMessage.append("<tr><td colspan='3' style='text-align: right;'><strong>Total:</strong></td>")
+                .append("<td style='text-align: right;'>")
+                .append(String.format("%.2f", rsGetTax.getDouble("total_order_amount")))
+                .append("</td></tr>");
+            }
+            
             detailsMessage.append("</table></div></html>");
 
             JOptionPane.showMessageDialog(this, new JLabel(detailsMessage.toString()), "Order Details", JOptionPane.INFORMATION_MESSAGE);
