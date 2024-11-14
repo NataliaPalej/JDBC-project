@@ -61,18 +61,13 @@ public class LoginScreen extends JFrame {
                 if (authResult == null) {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    // Successfully authenticated
-                	String message = "<html><div style='text-align: center;'><h3 style='font-family: DialogInput;'>Welcome to Makeup Store</h3><br></div></html>";
-                    JOptionPane.showMessageDialog(null, message);
                     if (authResult.isAdmin) {
-                    	 // Open admin screen 
                         new AdminScreen(authResult.getCustomerID());
                         
                     } else {
-                    	// Open customer screen
                         new MakeupStore(authResult.getCustomerID()); 
                     }
-                 // Close the login window
+                    // Close the login window
                     dispose(); 
                 }
             } catch (NataliaException ne) {
