@@ -33,17 +33,17 @@ public class AdminScreen extends JFrame implements ActionListener {
 			product_img;
 
 	public AdminScreen(int customer_id) throws NataliaException {
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("Options");
 		exitOption = new JMenuItem("Exit");
-		
+
 		fileMenu.add(exitOption);
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
-		
+
 		exitOption.addActionListener(this);
-		
+
 		setTitle("Admin");
 		setSize(900, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,13 +54,13 @@ public class AdminScreen extends JFrame implements ActionListener {
 
 		setVisible(true);
 	}
-	
+
 	@Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource().equals(exitOption)) {
-            this.dispose(); // Closes only the AdminScreen window
-        }
-    }
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource().equals(exitOption)) {
+			this.dispose(); // Closes only the AdminScreen window
+		}
+	}
 
 	/**********************
 	 * Left Panel Method *
@@ -238,10 +238,10 @@ public class AdminScreen extends JFrame implements ActionListener {
 	}
 
 	private boolean saveProductToDatabase(String code, String category, String brand, String name, String desc,
-            BigDecimal price, BigDecimal discount, int stock, String imgPath) throws SQLException, NataliaException {
-	
+			BigDecimal price, BigDecimal discount, int stock, String imgPath) throws SQLException, NataliaException {
+
 		String sp_add_new_product = "{CALL sp_add_new_product(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-		
+
 		try (Connection connection = DatabaseConnector.getConnection();
 				PreparedStatement stmt = connection.prepareStatement(sp_add_new_product)) {
 
@@ -257,11 +257,11 @@ public class AdminScreen extends JFrame implements ActionListener {
 			stmt.setString(9, imgPath);
 
 			ResultSet rs = stmt.executeQuery();
-			
+
 			if (rs.next() && rs.getString(1).contains("successfully")) {
-			    return true;
+				return true;
 			} else {
-			    return false;
+				return false;
 			}
 		}
 	}
@@ -359,12 +359,12 @@ public class AdminScreen extends JFrame implements ActionListener {
 	// Method to load a specific product by product ID
 	private void searchProductById(int productId) throws NataliaException {
 		String query = "SELECT * FROM products WHERE product_id = ?";
-		tableModel.setRowCount(0); 
+		tableModel.setRowCount(0);
 
 		try (Connection connection = DatabaseConnector.getConnection();
 				PreparedStatement stmt = connection.prepareStatement(query)) {
 
-			stmt.setInt(1, productId); 
+			stmt.setInt(1, productId);
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
 					// Load and scale the image directly from path
@@ -561,25 +561,26 @@ public class AdminScreen extends JFrame implements ActionListener {
 
 			// Set parameters for the update query
 			stmt.setInt(1, productId);
-	        stmt.setString(2, productCode);
-	        stmt.setString(3, category);
-	        stmt.setString(4, brand);
-	        stmt.setString(5, name);
-	        stmt.setString(6, description);
-	        stmt.setBigDecimal(7, new BigDecimal(price));
-	        stmt.setBigDecimal(8, new BigDecimal(discount));
-	        stmt.setInt(9, Integer.parseInt(stock));
-	        stmt.setString(10, img);
+			stmt.setString(2, productCode);
+			stmt.setString(3, category);
+			stmt.setString(4, brand);
+			stmt.setString(5, name);
+			stmt.setString(6, description);
+			stmt.setBigDecimal(7, new BigDecimal(price));
+			stmt.setBigDecimal(8, new BigDecimal(discount));
+			stmt.setInt(9, Integer.parseInt(stock));
+			stmt.setString(10, img);
 
-	        ResultSet rs = stmt.executeQuery();
-	        
-	        if (rs.next() && rs.getString("status").contains("updated successfully")) {
-	            return true;
-	        } else {
-	            JOptionPane.showMessageDialog(this, "Failed to update product. Please check your inputs.", "Error", JOptionPane.ERROR_MESSAGE);
-	            return false;
-	        }
-	        
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.next() && rs.getString("status").contains("updated successfully")) {
+				return true;
+			} else {
+				JOptionPane.showMessageDialog(this, "Failed to update product. Please check your inputs.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+
 		} catch (SQLException ex) {
 			JOptionPane.showMessageDialog(this, "Error updating product: " + ex.getMessage(), "Database Error",
 					JOptionPane.ERROR_MESSAGE);
@@ -727,245 +728,258 @@ public class AdminScreen extends JFrame implements ActionListener {
 
 	private JPanel createCustomerOrderPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
-		
-	    // Search panel
-	    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-	    JLabel searchLabel = new JLabel("Enter Order ID: ");
-	    JTextField searchField = new JTextField(10);
-	    JButton searchButton = new JButton("SEARCH");
-	    JButton clearButton = new JButton("CLEAR");
-	    JButton exportButton = new JButton("EXPORT");
 
-	    searchPanel.add(searchLabel);
-	    searchPanel.add(searchField);
-	    searchPanel.add(searchButton);
-	    searchPanel.add(clearButton);
-	    searchPanel.add(exportButton);
+		// Search panel
+		JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JLabel searchLabel = new JLabel("Enter Order ID: ");
+		JTextField searchField = new JTextField(10);
+		JButton searchButton = new JButton("SEARCH");
+		JButton clearButton = new JButton("CLEAR");
+		JButton exportButton = new JButton("EXPORT");
 
-	    // Text area to display order details
-	    JTextArea invoiceArea = new JTextArea(20, 50);
-	    invoiceArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-	    invoiceArea.setEditable(false);
-	    JScrollPane scrollPane = new JScrollPane(invoiceArea);
+		searchPanel.add(searchLabel);
+		searchPanel.add(searchField);
+		searchPanel.add(searchButton);
+		searchPanel.add(clearButton);
+		searchPanel.add(exportButton);
 
-	    panel.add(searchPanel, BorderLayout.NORTH);
-	    panel.add(scrollPane, BorderLayout.CENTER);
+		// TextArea to display order details
+		JTextArea invoiceArea = new JTextArea(20, 50);
+		invoiceArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+		invoiceArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(invoiceArea);
 
-	    // Action listener for SEARCH button
-	    searchButton.addActionListener(e -> {
-	        String orderIdText = searchField.getText().trim();
-	        if (!orderIdText.isEmpty()) {
-	            try {
-	                int orderId = Integer.parseInt(orderIdText);
-	                displayInvoice(orderId, invoiceArea);
-	            } catch (NumberFormatException | NataliaException ex) {
-	                JOptionPane.showMessageDialog(this, "Please enter a valid numeric Order ID.", "Input Error",
-	                        JOptionPane.ERROR_MESSAGE);
-	            }
-	        } else {
-	            JOptionPane.showMessageDialog(this, "Order ID cannot be empty.", "Input Error",
-	                    JOptionPane.WARNING_MESSAGE);
-	        }
-	    });
+		panel.add(searchPanel, BorderLayout.NORTH);
+		panel.add(scrollPane, BorderLayout.CENTER);
 
-	    // Action listener for CLEAR button
-	    clearButton.addActionListener(e -> {
-	        searchField.setText("");
-	        invoiceArea.setText("");
-	    });
+		// Action for searchButton
+		searchButton.addActionListener(e -> {
+			String orderIdText = searchField.getText().trim();
+			if (!orderIdText.isEmpty()) {
+				try {
+					int orderId = Integer.parseInt(orderIdText);
+					displayInvoice(orderId, invoiceArea);
+				} catch (NumberFormatException | NataliaException | SQLException ex) {
+					JOptionPane.showMessageDialog(this, "Please enter a valid numeric Order ID.", "Input Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, "Order ID cannot be empty.", "Input Error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		});
 
-	    // Action listener for EXPORT button
-	    exportButton.addActionListener(e -> exportInvoice(invoiceArea.getText()));
+		// Action for clearButton
+		clearButton.addActionListener(e -> {
+			searchField.setText("");
+			invoiceArea.setText("");
+		});
 
-	    return panel;
+		// Action for exportButton
+		exportButton.addActionListener(e -> exportInvoice(invoiceArea.getText()));
+
+		return panel;
 
 	}
-	
-	private void displayInvoice(int orderId, JTextArea invoiceArea) throws NataliaException {
-	    try (Connection connection = DatabaseConnector.getConnection();
-	         Statement stmt = connection.createStatement()) {
 
-	        // Fetch order and customer details from the view
-	        String query = "SELECT * FROM customer_orders_view WHERE order_id = " + orderId;
-	        ResultSet rs = stmt.executeQuery(query);
-	        
-	        System.out.println(query);
+	private void displayInvoice(int orderId, JTextArea invoiceArea) throws NataliaException, SQLException {
+		// Format the result as an invoice
+		StringBuilder invoice = new StringBuilder();
+		StringBuilder order_details = new StringBuilder();
 
-	        // Format the result as an invoice
-	        StringBuilder invoice = new StringBuilder();
-	        
-	        // Check if the ResultSet contains any data
-	        if (!rs.next()) {
-	            invoiceArea.setText("No order details found for this Order ID.");
-	            return;
+		try (Connection connection = DatabaseConnector.getConnection(); Statement stmt = connection.createStatement()) {
+
+			// Fetch order and customer details from the view
+			String query = "SELECT * FROM customer_orders_view WHERE order_id = " + orderId;
+			ResultSet rs = stmt.executeQuery(query);
+
+			System.out.println(query);
+
+			// Check if the ResultSet contains any data
+			if (!rs.next()) {
+				invoiceArea.setText("No order details found for this Order ID.");
+				return;
+			}
+
+			// Customer and order information (only populated once)
+			invoice.append(rs.getString("first_name")).append(" ").append(rs.getString("last_name"))
+					.append("\t\tOrder Date: ").append(rs.getString("order_date")).append("\n")
+					.append(rs.getString("address1")).append("\n").append(rs.getString("address2")).append("\n")
+					.append(rs.getString("city")).append("\n").append(rs.getString("eircode")).append("\n\n")
+					.append("Email: ").append(rs.getString("email_address")).append("\n").append("Phone: ")
+					.append(rs.getString("phone_no")).append("\n\n").append("\t\t\tORDER DETAILS\n")
+					.append("---------------------------------------------------------\n");
+		}
+		try (Connection connection = DatabaseConnector.getConnection();
+				Statement stmt2 = connection.createStatement()) {
+
+			String query2 = "SELECT * FROM customer_orders_view WHERE order_id = " + orderId;
+			ResultSet rs2 = stmt2.executeQuery(query2);
+			
+			// Order details in table format
+			order_details.append(String.format("%-10s %-30s %-5s %-10s\n", "Code", "Name", "Qty", "Price"));
+
+
+			if (rs2.next()) {
+	            double taxAmount = rs2.getDouble("tax_amount");
+	            double totalOrderAmount = rs2.getDouble("total_order_amount");
+	            double discount = rs2.getDouble("discount");
+
+	            // Add the first row's order details and continue looping for other rows
+	            do {
+	                order_details.append(String.format("%-10s %-30s %-5d %-10.2f\n",
+	                                rs2.getString("product_code"),
+	                                rs2.getString("product_name"),
+	                                rs2.getInt("quantity"),
+	                                rs2.getDouble("total_item_cost")));
+	            } while (rs2.next());
+
+	            // Append totals to the invoice
+	            order_details.append("\n").append("---------------------------------------------------------\n")
+	                         .append(String.format("Tax: %.2f\n", taxAmount))
+	                         .append(String.format("Discount: %.2f\n", discount))
+	                         .append("---------------------------------------------------------\n")
+	                         .append(String.format("Total: %.2f\n\n", totalOrderAmount))
+	                         .append("THANK YOU FOR SHOPPING WITH US!");
+
+	            invoice.append(order_details);
 	        }
-	        
-	        // Customer and order information (only populated once)
-	        invoice.append(rs.getString("first_name")).append(" ").append(rs.getString("last_name"))
-	               .append("\t\tOrder Date: ").append(rs.getString("order_date")).append("\n")
-	               .append(rs.getString("address1")).append("\n")
-	               .append(rs.getString("address2")).append("\n")
-	               .append(rs.getString("city")).append("\n")
-	               .append(rs.getString("eircode")).append("\n\n")
-	               .append("Email: ").append(rs.getString("email_address")).append("\n")
-	               .append("Phone: ").append(rs.getString("phone_no")).append("\n\n")
-	               .append("\t\t\tORDER DETAILS\n")
-	               .append("---------------------------------------------------------\n")
-	               .append("Code\tName\t\t\tQuantity\tTotal Price\n")
-	               .append(rs.getString("product_code")).append("\t")
-	               .append(rs.getString("product_name")).append("\t")
-	               .append(rs.getInt("quantity")).append("\t\t")
-	               .append(rs.getDouble("total_item_cost")).append("\n");
-	        
-	        double taxAmount = rs.getDouble("tax_amount");
-	        double totalOrderAmount = rs.getDouble("total_order_amount");
-	        double discount = rs.getDouble("discount");
 
-	        // Append totals to the invoice
-	        invoice.append("\n")
-	               .append("---------------------------------------------------------\n")
-	               .append(String.format("Tax: %.2f\n", taxAmount))
-	               .append(String.format("Discount: %.2f\n", discount))
-	               .append("---------------------------------------------------------\n")
-	               .append(String.format("Total: %.2f\n\n", totalOrderAmount))
-	               .append("THANK YOU FOR SHOPPING WITH US!");
-	        
 	        System.out.println("\n\ninvoice after numeric values::\n" + invoice);
 
 	        // Display the formatted invoice in the text area
 	        invoiceArea.setText(invoice.toString());
 
-	    } catch (SQLException ex) {
-	        JOptionPane.showMessageDialog(this, "Error fetching order details: " + ex.getMessage(), "Database Error",
-	                JOptionPane.ERROR_MESSAGE);
-	    }
+		} catch (SQLException ex) {
+			JOptionPane.showMessageDialog(this, "Error fetching order details: " + ex.getMessage(), "Database Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
-	
+
 	private void exportInvoice(String invoiceText) {
-	    if (invoiceText.isEmpty()) {
-	        JOptionPane.showMessageDialog(this, "No invoice to export.", "Export Error", JOptionPane.WARNING_MESSAGE);
-	        return;
-	    }
-	    try {
-	        // Ensure export directory exists
-	        File exportDir = new File("exports");
-	        if (!exportDir.exists()) exportDir.mkdirs();
+		if (invoiceText.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "No invoice to export.", "Export Error", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		try {
+			// Ensure export directory exists
+			File exportDir = new File("exports");
+			if (!exportDir.exists())
+				exportDir.mkdirs();
 
-	        // Save invoice to a file
-	        String filePath = "exports/invoice_" + System.currentTimeMillis() + ".txt";
-	        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
-	            writer.write(invoiceText);
-	        }
+			// Save invoice to a file
+			String filePath = "exports/invoice_" + System.currentTimeMillis() + ".txt";
+			try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+				writer.write(invoiceText);
+			}
 
-	        JOptionPane.showMessageDialog(this, "Invoice exported successfully to " + filePath, "Export Successful", JOptionPane.INFORMATION_MESSAGE);
-	    } catch (IOException ex) {
-	        JOptionPane.showMessageDialog(this, "Error exporting invoice: " + ex.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
-	    }
+			JOptionPane.showMessageDialog(this, "Invoice exported successfully to " + filePath, "Export Successful",
+					JOptionPane.INFORMATION_MESSAGE);
+		} catch (IOException ex) {
+			JOptionPane.showMessageDialog(this, "Error exporting invoice: " + ex.getMessage(), "Export Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
-	
 
 	private JPanel createSalesPanel() {
-		JPanel panel = new JPanel(new BorderLayout());
+	    JPanel panel = new JPanel(new BorderLayout());
 
-		// ComboBox to choose the type of sales report
-		JLabel filterLabel = new JLabel("View Sales By:");
-		JComboBox<String> filterOptions = new JComboBox<>(new String[] { "", "Category", "Brand", "Product" });
+	    // ComboBox to choose the type of sales report
+	    JLabel filterLabel = new JLabel("View Sales By:");
+	    JComboBox<String> filterOptions = new JComboBox<>(new String[] { "", "Category", "Brand", "Product" });
 
-		// Panel for filter options
-		JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		filterPanel.add(filterLabel);
-		filterPanel.add(filterOptions);
+	    // Panel for filter options
+	    JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    filterPanel.add(filterLabel);
+	    filterPanel.add(filterOptions);
 
-		JButton exportButton = new JButton("Export");
-		filterPanel.add(exportButton);
+	    JButton exportButton = new JButton("Export");
+	    filterPanel.add(exportButton);
 
-		// Table to display sales data
-		String[] columnNames = { "Product Name", "Quantity Sold", "Total Sales" };
-		DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-		JTable salesTable = new JTable(tableModel);
+	    // Table to display sales data
+	    String[] columnNames = { "Product Name", "Quantity Sold", "Total Sales" };
+	    DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+	    JTable salesTable = new JTable(tableModel);
 
-		// Scroll pane for the table
-		JScrollPane scrollPane = new JScrollPane(salesTable);
+	    // Scroll pane for the table
+	    JScrollPane scrollPane = new JScrollPane(salesTable);
 
-		// Add components to the main panel
-		panel.add(filterPanel, BorderLayout.NORTH);
-		panel.add(scrollPane, BorderLayout.CENTER);
+	    panel.add(filterPanel, BorderLayout.NORTH);
+	    panel.add(scrollPane, BorderLayout.CENTER);
 
-		// Action listener for filter selection
-		filterOptions.addActionListener(e -> {
-			String selectedOption = (String) filterOptions.getSelectedItem();
-			try {
-				if (selectedOption.equals("Category")) {
-					loadSalesDataByCategory(tableModel);
-				}
-				if (selectedOption.equals("Brand")) {
-					loadSalesDataByBrand(tableModel);
-				}
-				if (selectedOption.equals("Product")) {
-					loadSalesDataByProduct(tableModel);
-				}
-				if (selectedOption.equals("")) {
-			        tableModel.setRowCount(0);
-			    }
-			} catch (NataliaException ex) {
-				JOptionPane.showMessageDialog(panel, "Error loading sales data: " + ex.getMessage(), "Database Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		});
+	    // Action for filter selection
+	    filterOptions.addActionListener(e -> {
+	        String selectedOption = (String) filterOptions.getSelectedItem();
+	        try {
+	            if (selectedOption.equals("Category")) {
+	                loadSalesDataByCategory(tableModel);
+	            }
+	            if (selectedOption.equals("Brand")) {
+	                loadSalesDataByBrand(tableModel);
+	            }
+	            if (selectedOption.equals("Product")) {
+	                loadSalesDataByProduct(tableModel);
+	            }
+	            if (selectedOption.equals("")) {
+	                tableModel.setRowCount(0);
+	            }
+	        } catch (NataliaException ex) {
+	            JOptionPane.showMessageDialog(panel, "Error loading sales data: " + ex.getMessage(), "Database Error",
+	                    JOptionPane.ERROR_MESSAGE);
+	        }
+	    });
 
-		// Action for exportButton
-		exportButton.addActionListener(e -> {
-			// Get selectedOption
-			String selectedOption = (String) filterOptions.getSelectedItem();
+	    // Action for button to call exportSales
+	    exportButton.addActionListener(e -> exportSales(filterOptions, tableModel, panel));
 
-			// Check if option selected
-			if (selectedOption.equals("")) {
-				JOptionPane.showMessageDialog(panel, "Please select a category before exporting.", "Export Error",
-						JOptionPane.WARNING_MESSAGE);
-				return;
-			}
+	    return panel;
+	}
+	
+	private void exportSales(JComboBox<String> filterOptions, DefaultTableModel tableModel, JPanel panel) {
+	    String selectedOption = (String) filterOptions.getSelectedItem();
+	    if (selectedOption.equals("")) {
+	        JOptionPane.showMessageDialog(panel, "Please select a category before exporting.", "Export Error", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
 
-			try {
-				File exportFolder = new File("exports");
-				// Create exports folder if it doesn't exist
-				if (!exportFolder.exists()) {
-					exportFolder.mkdir();
-				}
+	    try {
+	        // Create exports folder if it doesn't exist
+	        File exportFolder = new File("exports");
+	        if (!exportFolder.exists()) {
+	            exportFolder.mkdir();
+	        }
 
-				// Get current date
-				String currentDate = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-				// Construct file name
-				String fileName = selectedOption.toLowerCase() + "-sales-" + currentDate + ".csv";
-				String filePath = "exports/" + fileName;
+	        // Get current date
+	        String currentDate = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss").format(new Date());
+	        // Construct file name
+	        String fileName = selectedOption.toLowerCase() + "-sales-" + currentDate + ".csv";
+	        String filePath = "exports/" + fileName;
 
-				FileWriter outputFile = new FileWriter(filePath);
+	        // Write to file
+	        FileWriter outputFile = new FileWriter(filePath);
 
-				// Write headers
-				for (int i = 0; i < tableModel.getColumnCount(); i++) {
-					outputFile.append(tableModel.getColumnName(i)).append(",");
-				}
-				outputFile.append("\n");
+	        // Write headers
+	        for (int i = 0; i < tableModel.getColumnCount(); i++) {
+	            outputFile.append(tableModel.getColumnName(i)).append(",");
+	        }
+	        outputFile.append("\n");
 
-				// Write data rows
-				for (int row = 0; row < tableModel.getRowCount(); row++) {
-					for (int col = 0; col < tableModel.getColumnCount(); col++) {
-						outputFile.append(tableModel.getValueAt(row, col).toString()).append(",");
-					}
-					outputFile.append("\n");
-				}
-				// Write any remaining data to the file
-				outputFile.flush();
-				// Close the file
-				outputFile.close();
+	        // Write data rows
+	        for (int row = 0; row < tableModel.getRowCount(); row++) {
+	            for (int col = 0; col < tableModel.getColumnCount(); col++) {
+	                outputFile.append(tableModel.getValueAt(row, col).toString()).append(",");
+	            }
+	            outputFile.append("\n");
+	        }
 
-				JOptionPane.showMessageDialog(panel, "Data exported successfully to " + filePath, "Export Successful",
-						JOptionPane.INFORMATION_MESSAGE);
-			} catch (IOException ex) {
-				JOptionPane.showMessageDialog(panel, "Error exporting data: " + ex.getMessage(), "Export Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		});
-		return panel;
+	        // Flush and close the file
+	        outputFile.flush();
+	        outputFile.close();
+
+	        JOptionPane.showMessageDialog(panel, "Data exported successfully to " + filePath, "Export Successful", JOptionPane.INFORMATION_MESSAGE);
+	    } catch (IOException ex) {
+	        JOptionPane.showMessageDialog(panel, "Error exporting data: " + ex.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
+	    }
 	}
 
 	private void loadSalesDataByCategory(DefaultTableModel tableModel) throws NataliaException {
