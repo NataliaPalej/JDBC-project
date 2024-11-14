@@ -1,0 +1,22 @@
+Deb Morgan		Order Date: 2024-11-10 17:00:00
+707 Cedar Rd
+null
+Cork
+T12 8901
+
+Email: deb.morgan@example.com
+Phone: 0897654321
+
+			ORDER DETAILS
+---------------------------------------------------------
+Code       Name                           Qty   Price     
+JS002      Velour Liquid Lipstick         1     13.71     
+HU001      Faux Filter Foundation         1     34.65     
+
+---------------------------------------------------------
+Tax: 11.12
+Discount: 0.00
+---------------------------------------------------------
+Total: 59.48
+
+THANK YOU FOR SHOPPING WITH US!

@@ -145,8 +145,7 @@ public class ViewOrdersContent extends JFrame {
                 .append("<tr><th>Product Code</th><th>Product Name</th><th>Quantity</th><th>Price</th></tr>");
 
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(
-                     "SELECT * FROM customer_orders_view WHERE customer_id=? and order_id=?")) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM customer_orders_view WHERE customer_id=? and order_id=?")) {
 
             stmt.setInt(1, customer_id);
             stmt.setInt(2, order_id);
