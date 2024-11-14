@@ -1,0 +1,24 @@
+Natalia Palej		Order Date: 2024-11-14 14:27:56
+Test
+Monksland
+Athlone
+Test
+
+Email: TestTest
+Phone: Test
+
+			ORDER DETAILS
+---------------------------------------------------------
+Code       Name                           Qty   Price     
+IT005      Waterproof Lip Liner Stain     1     16.94     
+JS002      Velour Liquid Lipstick         1     13.71     
+JS005      Velour Lip Scrub               2     23.88     
+IT004      Tightline Lash Length Mascara  1     22.33     
+
+---------------------------------------------------------
+Tax: 17.68
+Discount: 0.00
+---------------------------------------------------------
+Total: 94.54
+
+THANK YOU FOR SHOPPING WITH US!

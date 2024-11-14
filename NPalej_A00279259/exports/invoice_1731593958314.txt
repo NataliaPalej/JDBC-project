@@ -1,0 +1,22 @@
+Nicola Brown		Order Date: 2024-11-05 16:00:00
+202 Maple St
+Floor 2
+Waterford
+X91 2345
+
+Email: nicola.brown@example.com
+Phone: 0871239876
+
+			ORDER DETAILS
+---------------------------------------------------------
+Code       Name                           Qty   Price     
+BE002      Brow Pencil                    1     13.48     
+RB001      Perfect Strokes Mascara        2     35.42     
+
+---------------------------------------------------------
+Tax: 11.25
+Discount: 0.00
+---------------------------------------------------------
+Total: 60.15
+
+THANK YOU FOR SHOPPING WITH US!
